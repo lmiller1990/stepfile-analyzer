@@ -1,9 +1,3 @@
-import fs from "fs";
-import { get } from "http";
-import path from "path";
-
-// const data = fs.readFileSync(path.join(__dirname, "Downfall.ssc"), "utf-8");
-
 export interface NoteLine {
   left: boolean;
   raw: string;
@@ -101,7 +95,7 @@ export const createAnalysisResults = () => {
       key,
       count: 0,
       found: false,
-      noteCheckIndex: 1,
+      noteCheckIndex: 0,
     };
   }
   return obj;
@@ -119,7 +113,8 @@ export function overlap(target: string, line: string) {
 
 export function analyzePatterns(
   values: Record<string, PatternAnalysis>,
-  notes: NoteLine[]
+  notes: NoteLine[],
+  patterns: PatternBag
 ) {
   for (const note of notes) {
     for (const key of keys) {
@@ -129,7 +124,9 @@ export function analyzePatterns(
       // current index we are comparing,
       const compare = patterns[key][values[key].noteCheckIndex];
 
+      console.log(`Checking ${compare} and ${note.raw}`);
       if (overlap(compare, note.raw)) {
+        console.log(note);
         values[key].found = true;
         values[key].noteCheckIndex++;
 
@@ -139,11 +136,11 @@ export function analyzePatterns(
 
           // reset
           values[key].found = false;
-          values[key].noteCheckIndex = 1;
+          values[key].noteCheckIndex = 0;
         }
       } else {
         values[key].found = false;
-        values[key].noteCheckIndex = 1;
+        values[key].noteCheckIndex = 0;
       }
     }
   }

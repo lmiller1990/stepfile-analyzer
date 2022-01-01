@@ -110,18 +110,19 @@ describe("analyzePatterns", () => {
     const lines = parse(data);
 
     const analysis = createAnalysisResults();
-    const actual = analyzePatterns(analysis, lines);
 
     const patterns: PatternBag = {
       "urd-candle": [up, right, down],
     };
+
+    const actual = analyzePatterns(analysis, lines, patterns);
 
     expect(actual).toEqual({
       "urd-candle": {
         key: "urd-candle",
         count: 1,
         found: false,
-        noteCheckIndex: 1,
+        noteCheckIndex: 0,
       },
     });
   });
