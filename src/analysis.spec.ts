@@ -1,15 +1,13 @@
 import { describe, it, expect } from "vitest";
+
+import { NoteLine } from "./types";
 import {
   analyzePatterns,
   createAnalysisResults,
-  down,
-  NoteLine,
   overlap,
   parse,
-  PatternBag,
-  right,
-  up,
-} from "./";
+} from "./analysis";
+import { down, right, up, PatternBag } from "./patterns";
 
 const data = `0010
 0001
@@ -109,11 +107,12 @@ describe("analyzePatterns", () => {
     ,`;
     const lines = parse(data);
 
-    const analysis = createAnalysisResults();
-
     const patterns: PatternBag = {
       "urd-candle": [up, right, down],
     };
+
+    const analysis = createAnalysisResults(patterns);
+
 
     const actual = analyzePatterns(analysis, lines, patterns);
 

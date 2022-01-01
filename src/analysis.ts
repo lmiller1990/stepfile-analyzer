@@ -1,12 +1,5 @@
-export interface NoteLine {
-  left: boolean;
-  raw: string;
-  up: boolean;
-  down: boolean;
-  right: boolean;
-  measure: number;
-  quantitization: number; // 4th, 8th etc.
-}
+import type { PatternBag } from "./patterns";
+import type { NoteLine, PatternAnalysis } from "./types";
 
 function getQuantitization(data: string[]) {
   let count = 0;
@@ -57,38 +50,7 @@ export function parse(data: string) {
   return notes;
 }
 
-// const patterns =
-
-// const =
-
-export const up = "0010";
-export const down = "0100";
-export const left = "1000";
-export const right = "0001";
-
-export type Note = typeof up | typeof down | typeof right | typeof down;
-
-interface Pattern {
-  key: string;
-  notes: Note[];
-}
-
-const keys = ["urd-candle"] as const;
-
-export type PatternBag = Record<string, readonly Note[]>;
-
-export const patterns: PatternBag = {
-  "urd-candle": [up, right, down] as const,
-} as const;
-
-export interface PatternAnalysis {
-  key: string; // urd-candle, etc
-  count: number;
-  found: boolean;
-  noteCheckIndex: number;
-}
-
-export const createAnalysisResults = () => {
+export const createAnalysisResults = (patterns: PatternBag) => {
   const obj: Record<string, PatternAnalysis> = {};
   for (const key of Object.keys(patterns)) {
     obj[key] = {
@@ -117,7 +79,7 @@ export function analyzePatterns(
   patterns: PatternBag
 ) {
   for (const note of notes) {
-    for (const key of keys) {
+    for (const key of Object.keys(patterns)) {
       // [up, right, left] for example - array of notes
       const pattern = patterns[key];
 
