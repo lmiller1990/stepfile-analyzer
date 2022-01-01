@@ -124,9 +124,7 @@ export function analyzePatterns(
       // current index we are comparing,
       const compare = patterns[key][values[key].noteCheckIndex];
 
-      console.log(`Checking ${compare} and ${note.raw}`);
       if (overlap(compare, note.raw)) {
-        console.log(note);
         values[key].found = true;
         values[key].noteCheckIndex++;
 
