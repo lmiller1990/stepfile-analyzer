@@ -240,15 +240,7 @@ describe("analyzePatterns", () => {
     const analysis = createAnalysisResults(patterns);
     const actual = analyzePatterns(analysis, lines, patterns);
 
-    expect(actual["urd-candle"].count).toBe(1);
-    expect(
-      actual["urd-candle"].collection.get("1")
-        ?.containedNotePositionsInMeasure[0].measureNumber
-    ).toBe(1);
-    // expect(actual["urd-candle"].collection.entries().next().value[1]).toBe(1);
-    // expect(actual["uld-candle"].count).toBe(1);
-    // expect(actual["dlu-candle"].count).toBe(1);
-    // expect(actual["dru-candle"].count).toBe(1);
+    expect(actual).toMatchSnapshot()
   });
 });
 

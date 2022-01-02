@@ -1,0 +1,118 @@
+// Vitest Snapshot v1
+
+exports[`analyzePatterns > 16th candles 1`] = `
+{
+  "dlu-candle": {
+    "collection": Map {
+      "6" => {
+        "completed": true,
+        "containedNotePositionsInMeasure": [
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 6,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 7,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 8,
+          },
+        ],
+        "noteCheckIndex": 3,
+        "quantitization": 16,
+      },
+    },
+    "count": 1,
+    "key": "dlu-candle",
+  },
+  "dru-candle": {
+    "collection": Map {
+      "9" => {
+        "completed": true,
+        "containedNotePositionsInMeasure": [
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 9,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 10,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 11,
+          },
+        ],
+        "noteCheckIndex": 3,
+        "quantitization": 16,
+      },
+    },
+    "count": 1,
+    "key": "dru-candle",
+  },
+  "uld-candle": {
+    "collection": Map {
+      "4" => {
+        "completed": true,
+        "containedNotePositionsInMeasure": [
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 4,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 5,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 6,
+          },
+        ],
+        "noteCheckIndex": 3,
+        "quantitization": 16,
+      },
+    },
+    "count": 1,
+    "key": "uld-candle",
+  },
+  "urd-candle": {
+    "collection": Map {
+      "1" => {
+        "completed": true,
+        "containedNotePositionsInMeasure": [
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 1,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 2,
+          },
+          {
+            "measureNumber": 1,
+            "measureQuantitization": 16,
+            "notePosInMeasure": 3,
+          },
+        ],
+        "noteCheckIndex": 3,
+        "quantitization": 16,
+      },
+    },
+    "count": 1,
+    "key": "urd-candle",
+  },
+}
+`;
