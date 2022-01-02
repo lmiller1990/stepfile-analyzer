@@ -11,6 +11,5 @@ export interface NoteLine {
 export interface PatternAnalysis {
   key: string; // urd-candle, etc
   count: number;
-  found: boolean;
   noteCheckIndex: number;
 }

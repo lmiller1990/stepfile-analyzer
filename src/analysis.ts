@@ -56,7 +56,6 @@ export const createAnalysisResults = (patterns: PatternBag) => {
     obj[key] = {
       key,
       count: 0,
-      found: false,
       noteCheckIndex: 0,
     };
   }
@@ -87,7 +86,6 @@ export function analyzePatterns(
       const compare = patterns[key][values[key].noteCheckIndex];
 
       if (overlap(compare, note.raw)) {
-        values[key].found = true;
         values[key].noteCheckIndex++;
 
         // done!
@@ -95,11 +93,9 @@ export function analyzePatterns(
           values[key].count++;
 
           // reset
-          values[key].found = false;
           values[key].noteCheckIndex = 0;
         }
       } else {
-        values[key].found = false;
         values[key].noteCheckIndex = 0;
       }
     }

@@ -7,7 +7,7 @@ import {
   overlap,
   parse,
 } from "./analysis";
-import { down, right, up, PatternBag } from "./patterns";
+import { down, right, up, PatternBag, left } from "./patterns";
 
 const data = `0010
 0001
@@ -120,9 +120,26 @@ describe("analyzePatterns", () => {
       "urd-candle": {
         key: "urd-candle",
         count: 1,
-        found: false,
         noteCheckIndex: 0,
       },
     });
+  });
+
+  it.only("double taps", () => {
+    const data = `1000
+1000
+1000
+1000
+,`;
+
+    const lines = parse(data);
+    const patterns: PatternBag = {
+      "ll": [left, left],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+    const actual = analyzePatterns(analysis, lines, patterns);
+
+    expect(actual["ll"].count).toBe(3)
   });
 });
