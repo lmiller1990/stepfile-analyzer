@@ -1,9 +1,10 @@
 import { describe, it, expect } from "vitest";
 
-import { NoteLine } from "./types";
+import { NoteLine, PatternData } from "./types";
 import {
   analyzePatterns,
   createAnalysisResults,
+  derivePatternQuantitization,
   overlap,
   parse,
 } from "./analysis";
@@ -28,10 +29,13 @@ describe("parse", () => {
   it("works", () => {
     const actual = parse(data);
     let id = 4;
+    let pos = 0;
     const empty = (measure: number): NoteLine => {
       id++;
+      pos++;
 
       return {
+        notePosInMeasure: pos,
         id: id.toString(),
         left: false,
         down: false,
@@ -46,6 +50,7 @@ describe("parse", () => {
     const expected: NoteLine[] = [
       {
         id: "0",
+        notePosInMeasure: 1,
         left: false,
         down: false,
         up: true,
@@ -56,6 +61,7 @@ describe("parse", () => {
       },
       {
         id: "1",
+        notePosInMeasure: 2,
         left: false,
         down: false,
         raw: "0001",
@@ -66,6 +72,7 @@ describe("parse", () => {
       },
       {
         id: "2",
+        notePosInMeasure: 3,
         left: false,
         down: true,
         up: false,
@@ -76,6 +83,7 @@ describe("parse", () => {
       },
       {
         id: "3",
+        notePosInMeasure: 4,
         raw: "0000",
         left: false,
         down: false,
@@ -129,13 +137,12 @@ describe("analyzePatterns", () => {
   });
 
   it("double taps", () => {
-    const data = `1000
+    const lines = parse(`1000
 1000
 1000
 1000
-,`;
+,`);
 
-    const lines = parse(data);
     const patterns: PatternBag = {
       ll: [left, left],
     };
@@ -144,5 +151,109 @@ describe("analyzePatterns", () => {
     const actual = analyzePatterns(analysis, lines, patterns);
 
     expect(actual["ll"].count).toBe(3);
+  });
+
+  it("quantitization", () => {
+    const lines = parse(`1000
+0000
+1000
+0000
+1000
+1000
+1000
+1000
+,`);
+
+    const patterns: PatternBag = {
+      ll: [left, left],
+      lll: [left, left, left],
+      llll: [left, left, left, left],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+    const actual = analyzePatterns(analysis, lines, patterns);
+
+    expect(actual["ll"].count).toBe(5);
+    expect(actual["lll"].count).toBe(4);
+    expect(actual["llll"].count).toBe(3);
+  });
+
+  it.only("adds quantitization to pattern", () => {
+    const lines = parse(`1000
+0000
+1000
+0000
+,`);
+
+    const patterns: PatternBag = {
+      ll: [left, left],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+    const actual = analyzePatterns(analysis, lines, patterns);
+
+    const identifiedPattern = actual["ll"].collection.get("0")!;
+
+    expect(actual["ll"].count).toBe(1);
+    expect(identifiedPattern.containedNotePositionsInMeasure).toEqual([
+      {
+        notePosInMeasure: 1,
+        measureQuantitization: 4,
+      },
+      {
+        notePosInMeasure: 3,
+        measureQuantitization: 4,
+      },
+    ]);
+
+    expect(identifiedPattern.quantitization).toBe(2);
+  });
+});
+
+describe("derivePatternQuantitization", () => {
+  it("works on basic 4th note jacks", () => {
+    const data: PatternData = {
+      noteCheckIndex: 0,
+      containedNotePositionsInMeasure: [
+        {
+          notePosInMeasure: 1,
+          measureQuantitization: 4,
+        },
+        {
+          notePosInMeasure: 2,
+          measureQuantitization: 4,
+        },
+      ],
+    };
+
+    const actual = derivePatternQuantitization(data)
+
+    // "4th" note jacks
+    expect(actual).toBe(4)
+  });
+
+  it("returns undefined on inconsistent spacing", () => {
+    const data: PatternData = {
+      noteCheckIndex: 0,
+      containedNotePositionsInMeasure: [
+        {
+          notePosInMeasure: 1,
+          measureQuantitization: 4,
+        },
+        {
+          notePosInMeasure: 2,
+          measureQuantitization: 4,
+        },
+        {
+          notePosInMeasure: 4,
+          measureQuantitization: 4,
+        },
+      ],
+    };
+
+    const actual = derivePatternQuantitization(data)
+
+    // "4th" note jacks
+    expect(actual).toBe(undefined)
   });
 });

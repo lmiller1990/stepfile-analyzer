@@ -1,5 +1,11 @@
 import type { PatternBag } from "./patterns";
-import type { NoteLine, PatternAnalysis } from "./types";
+import type {
+  FinalPatternAnalysis,
+  FinalPatternData,
+  NoteLine,
+  PatternAnalysis,
+  PatternData,
+} from "./types";
 
 function getQuantitization(data: string[]) {
   let count = 0;
@@ -19,12 +25,14 @@ export function parse(data: string) {
   let measure = 1;
   let measureQuantitization: number = 0;
   let newMeasure = true;
+  let notePosInMeasure = 1;
 
   for (const d in lines) {
     const datum = lines[d];
 
     if (datum === ",") {
       measure++;
+      notePosInMeasure = 1;
       newMeasure = true;
       continue;
     }
@@ -36,6 +44,7 @@ export function parse(data: string) {
 
     const line: NoteLine = {
       id: d,
+      notePosInMeasure,
       raw: datum,
       left: datum[0] === "1",
       down: datum[1] === "1",
@@ -46,6 +55,8 @@ export function parse(data: string) {
     };
 
     notes.push(line);
+
+    notePosInMeasure++;
   }
 
   return notes;
@@ -86,18 +97,22 @@ export function analyzePatterns(
       // check existing patterns we've encountered
       for (const [k, found] of values[key].collection) {
         if (overlap(pattern[found.noteCheckIndex], note.raw)) {
-          const updated = {
+          const updated: PatternData = {
             ...found,
             noteCheckIndex: found.noteCheckIndex + 1,
+            containedNotePositionsInMeasure:
+              found.containedNotePositionsInMeasure.concat({
+                notePosInMeasure: note.notePosInMeasure,
+                measureQuantitization: note.quantitization,
+              }),
           };
 
           values[key].collection.set(k, updated);
 
           if (updated.noteCheckIndex === pattern.length) {
             // end of pattern, increase count and delete
-            values[key].count++
-            values[key].collection.delete(k)
-          } 
+            values[key].count++;
+          }
         }
       }
 
@@ -106,10 +121,85 @@ export function analyzePatterns(
 
       // check for start of pattern
       if (overlap(firstNoteOfPattern, note.raw)) {
-        values[key].collection.set(note.id, { noteCheckIndex: 1 });
+        values[key].collection.set(note.id, {
+          noteCheckIndex: 1,
+          containedNotePositionsInMeasure: [
+            {
+              notePosInMeasure: note.notePosInMeasure,
+              measureQuantitization: note.quantitization,
+            },
+          ],
+        });
       }
     }
   }
 
+  // clean up
+  for (const key of Object.keys(patterns)) {
+    // [up, right, left] for example - array of notes
+    const pattern = patterns[key];
+
+    for (const [k, found] of values[key].collection) {
+      if (found.noteCheckIndex !== pattern.length) {
+        values[key].collection.delete(k);
+      }
+    }
+  }
+
+  // finalize
+  for (const key of Object.keys(patterns)) {
+    for (const [k, found] of values[key].collection) {
+      values[key].collection.set(k, {
+        ...found,
+        quantitization: derivePatternQuantitization(found),
+      });
+    }
+  }
+
   return values;
+}
+
+export function derivePatternQuantitization(
+  data: PatternData
+): number | undefined {
+  let diff: number | undefined;
+
+  for (let i = data.containedNotePositionsInMeasure.length; i > 0; i--) {
+    const n2 = data.containedNotePositionsInMeasure[i - 1];
+    const n1 = data.containedNotePositionsInMeasure[i - 2];
+
+    if (!n1) {
+      return diff
+    }
+
+    // TODO: case of pattern overlapping two measures with diff
+    // quantitizations.
+    // undefined for now since it's complex.
+    if (n2.measureQuantitization !== n1.measureQuantitization) {
+      return undefined;
+    }
+
+    if (!diff) {
+      diff =
+        n2.measureQuantitization / (n2.notePosInMeasure - n1.notePosInMeasure);
+    } else {
+      const nextDiff =
+        n2.measureQuantitization / (n2.notePosInMeasure - n1.notePosInMeasure);
+
+      // pattern is not "consistent"
+      // eg we might have a 3 note left jack:
+      // 1000
+      // 1000
+      // 0000
+      // 1000
+      // but it's not really what you'd call a jack - those are supposed to
+      // consistently have the same amount of time between each.
+      // this is more like a broken 3 left arrow jack, which we don't really care about.
+      if (nextDiff !== diff) {
+        return undefined;
+      }
+    }
+  }
+
+  return diff;
 }
