@@ -1,4 +1,5 @@
 export interface NoteLine {
+  id: string
   left: boolean;
   raw: string;
   up: boolean;
@@ -11,5 +12,10 @@ export interface NoteLine {
 export interface PatternAnalysis {
   key: string; // urd-candle, etc
   count: number;
-  noteCheckIndex: number;
+  collection: Map<
+    string,
+    {
+      noteCheckIndex: number;
+    }
+  >;
 }

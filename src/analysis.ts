@@ -35,6 +35,7 @@ export function parse(data: string) {
     }
 
     const line: NoteLine = {
+      id: d,
       raw: datum,
       left: datum[0] === "1",
       down: datum[1] === "1",
@@ -56,7 +57,7 @@ export const createAnalysisResults = (patterns: PatternBag) => {
     obj[key] = {
       key,
       count: 0,
-      noteCheckIndex: 0,
+      collection: new Map(),
     };
   }
   return obj;
@@ -82,21 +83,30 @@ export function analyzePatterns(
       // [up, right, left] for example - array of notes
       const pattern = patterns[key];
 
-      // current index we are comparing,
-      const compare = patterns[key][values[key].noteCheckIndex];
+      // check existing patterns we've encountered
+      for (const [k, found] of values[key].collection) {
+        if (overlap(pattern[found.noteCheckIndex], note.raw)) {
+          const updated = {
+            ...found,
+            noteCheckIndex: found.noteCheckIndex + 1,
+          };
 
-      if (overlap(compare, note.raw)) {
-        values[key].noteCheckIndex++;
+          values[key].collection.set(k, updated);
 
-        // done!
-        if (values[key].noteCheckIndex === pattern.length) {
-          values[key].count++;
-
-          // reset
-          values[key].noteCheckIndex = 0;
+          if (updated.noteCheckIndex === pattern.length) {
+            // end of pattern, increase count and delete
+            values[key].count++
+            values[key].collection.delete(k)
+          } 
         }
-      } else {
-        values[key].noteCheckIndex = 0;
+      }
+
+      // current index we are comparing,
+      const firstNoteOfPattern = pattern[0];
+
+      // check for start of pattern
+      if (overlap(firstNoteOfPattern, note.raw)) {
+        values[key].collection.set(note.id, { noteCheckIndex: 1 });
       }
     }
   }

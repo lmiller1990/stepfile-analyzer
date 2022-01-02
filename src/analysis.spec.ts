@@ -27,18 +27,25 @@ const data = `0010
 describe("parse", () => {
   it("works", () => {
     const actual = parse(data);
-    const empty = (measure: number): NoteLine => ({
-      left: false,
-      down: false,
-      quantitization: 8,
-      raw: "0000",
-      up: false,
-      right: false,
-      measure,
-    });
+    let id = 4;
+    const empty = (measure: number): NoteLine => {
+      id++;
+
+      return {
+        id: id.toString(),
+        left: false,
+        down: false,
+        quantitization: 8,
+        raw: "0000",
+        up: false,
+        right: false,
+        measure,
+      };
+    };
 
     const expected: NoteLine[] = [
       {
+        id: "0",
         left: false,
         down: false,
         up: true,
@@ -48,6 +55,7 @@ describe("parse", () => {
         quantitization: 4,
       },
       {
+        id: "1",
         left: false,
         down: false,
         raw: "0001",
@@ -57,6 +65,7 @@ describe("parse", () => {
         quantitization: 4,
       },
       {
+        id: "2",
         left: false,
         down: true,
         up: false,
@@ -66,6 +75,7 @@ describe("parse", () => {
         quantitization: 4,
       },
       {
+        id: "3",
         raw: "0000",
         left: false,
         down: false,
@@ -113,19 +123,12 @@ describe("analyzePatterns", () => {
 
     const analysis = createAnalysisResults(patterns);
 
-
     const actual = analyzePatterns(analysis, lines, patterns);
 
-    expect(actual).toEqual({
-      "urd-candle": {
-        key: "urd-candle",
-        count: 1,
-        noteCheckIndex: 0,
-      },
-    });
+    expect(actual["urd-candle"].count).toBe(1);
   });
 
-  it.only("double taps", () => {
+  it("double taps", () => {
     const data = `1000
 1000
 1000
@@ -134,12 +137,12 @@ describe("analyzePatterns", () => {
 
     const lines = parse(data);
     const patterns: PatternBag = {
-      "ll": [left, left],
+      ll: [left, left],
     };
 
     const analysis = createAnalysisResults(patterns);
     const actual = analyzePatterns(analysis, lines, patterns);
 
-    expect(actual["ll"].count).toBe(3)
+    expect(actual["ll"].count).toBe(3);
   });
 });
