@@ -28,7 +28,7 @@ const data = `0010
 describe("parse", () => {
   it("works", () => {
     const actual = parse(data);
-    let id = 4;
+    let id = 5;
     let pos = 0;
     const empty = (measure: number): NoteLine => {
       id++;
@@ -49,7 +49,7 @@ describe("parse", () => {
 
     const expected: NoteLine[] = [
       {
-        id: "0",
+        id: "1",
         notePosInMeasure: 1,
         left: false,
         down: false,
@@ -60,7 +60,7 @@ describe("parse", () => {
         quantitization: 4,
       },
       {
-        id: "1",
+        id: "2",
         notePosInMeasure: 2,
         left: false,
         down: false,
@@ -71,7 +71,7 @@ describe("parse", () => {
         quantitization: 4,
       },
       {
-        id: "2",
+        id: "3",
         notePosInMeasure: 3,
         left: false,
         down: true,
@@ -82,7 +82,7 @@ describe("parse", () => {
         quantitization: 4,
       },
       {
-        id: "3",
+        id: "4",
         notePosInMeasure: 4,
         raw: "0000",
         left: false,
@@ -178,7 +178,7 @@ describe("analyzePatterns", () => {
     expect(actual["llll"].count).toBe(3);
   });
 
-  it.only("adds quantitization to pattern", () => {
+  it("adds quantitization to pattern", () => {
     const lines = parse(`1000
 0000
 1000
@@ -192,21 +192,63 @@ describe("analyzePatterns", () => {
     const analysis = createAnalysisResults(patterns);
     const actual = analyzePatterns(analysis, lines, patterns);
 
-    const identifiedPattern = actual["ll"].collection.get("0")!;
+    const identifiedPattern = actual["ll"].collection.get("1")!;
 
     expect(actual["ll"].count).toBe(1);
     expect(identifiedPattern.containedNotePositionsInMeasure).toEqual([
       {
         notePosInMeasure: 1,
         measureQuantitization: 4,
+        measureNumber: 1,
       },
       {
         notePosInMeasure: 3,
         measureQuantitization: 4,
+        measureNumber: 1,
       },
     ]);
 
     expect(identifiedPattern.quantitization).toBe(2);
+  });
+
+  it("16th candles", () => {
+    const lines = parse(`0010
+0001
+0100
+0010
+1000
+0100
+1000
+0010
+0100
+0001
+0010
+0000
+0000
+0000
+0000
+0000
+,`);
+
+    const patterns: PatternBag = {
+      "urd-candle": [up, right, down],
+      "uld-candle": [up, left, down],
+      "dlu-candle": [down, left, up],
+      "dru-candle": [down, right, up],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+    const actual = analyzePatterns(analysis, lines, patterns);
+
+    expect(actual["urd-candle"].count).toBe(1);
+    expect(
+      actual["urd-candle"].collection.get("1")
+        ?.containedNotePositionsInMeasure[0].measureNumber
+    ).toBe(1);
+    // expect(actual["urd-candle"].collection.entries().next().value[1]).toBe(1);
+    // expect(actual["uld-candle"].count).toBe(1);
+    // expect(actual["dlu-candle"].count).toBe(1);
+    // expect(actual["dru-candle"].count).toBe(1);
   });
 });
 
@@ -214,46 +256,53 @@ describe("derivePatternQuantitization", () => {
   it("works on basic 4th note jacks", () => {
     const data: PatternData = {
       noteCheckIndex: 0,
+      completed: true,
       containedNotePositionsInMeasure: [
         {
           notePosInMeasure: 1,
           measureQuantitization: 4,
+          measureNumber: 1,
         },
         {
           notePosInMeasure: 2,
           measureQuantitization: 4,
+          measureNumber: 1,
         },
       ],
     };
 
-    const actual = derivePatternQuantitization(data)
+    const actual = derivePatternQuantitization(data);
 
     // "4th" note jacks
-    expect(actual).toBe(4)
+    expect(actual).toBe(4);
   });
 
   it("returns undefined on inconsistent spacing", () => {
     const data: PatternData = {
       noteCheckIndex: 0,
+      completed: true,
       containedNotePositionsInMeasure: [
         {
           notePosInMeasure: 1,
           measureQuantitization: 4,
+          measureNumber: 1,
         },
         {
           notePosInMeasure: 2,
           measureQuantitization: 4,
+          measureNumber: 1,
         },
         {
           notePosInMeasure: 4,
           measureQuantitization: 4,
+          measureNumber: 1,
         },
       ],
     };
 
-    const actual = derivePatternQuantitization(data)
+    const actual = derivePatternQuantitization(data);
 
     // "4th" note jacks
-    expect(actual).toBe(undefined)
+    expect(actual).toBe(undefined);
   });
 });

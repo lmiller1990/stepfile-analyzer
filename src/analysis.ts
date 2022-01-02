@@ -1,11 +1,5 @@
 import type { PatternBag } from "./patterns";
-import type {
-  FinalPatternAnalysis,
-  FinalPatternData,
-  NoteLine,
-  PatternAnalysis,
-  PatternData,
-} from "./types";
+import type { NoteLine, PatternAnalysis, PatternData } from "./types";
 
 function getQuantitization(data: string[]) {
   let count = 0;
@@ -43,7 +37,7 @@ export function parse(data: string) {
     }
 
     const line: NoteLine = {
-      id: d,
+      id: (parseInt(d, 10) + 1).toString(),
       notePosInMeasure,
       raw: datum,
       left: datum[0] === "1",
@@ -104,14 +98,26 @@ export function analyzePatterns(
               found.containedNotePositionsInMeasure.concat({
                 notePosInMeasure: note.notePosInMeasure,
                 measureQuantitization: note.quantitization,
+                measureNumber: note.measure,
               }),
           };
 
           values[key].collection.set(k, updated);
 
           if (updated.noteCheckIndex === pattern.length) {
-            // end of pattern, increase count and delete
+            // end of pattern, set completed, increase count
+            values[key].collection.set(k, {
+              ...values[key].collection.get(k)!,
+              completed: true,
+            });
             values[key].count++;
+          }
+        } else if (note.raw === "0000") {
+          // do nothing for now, pattern could continue
+        } else {
+          // abandon pattern if not already found and counted.
+          if (!found.completed) {
+            values[key].collection.delete(k);
           }
         }
       }
@@ -123,10 +129,12 @@ export function analyzePatterns(
       if (overlap(firstNoteOfPattern, note.raw)) {
         values[key].collection.set(note.id, {
           noteCheckIndex: 1,
+          completed: false,
           containedNotePositionsInMeasure: [
             {
               notePosInMeasure: note.notePosInMeasure,
               measureQuantitization: note.quantitization,
+              measureNumber: note.measure,
             },
           ],
         });
@@ -169,7 +177,7 @@ export function derivePatternQuantitization(
     const n1 = data.containedNotePositionsInMeasure[i - 2];
 
     if (!n1) {
-      return diff
+      return diff;
     }
 
     // TODO: case of pattern overlapping two measures with diff

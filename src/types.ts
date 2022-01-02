@@ -12,6 +12,7 @@ export interface NoteLine {
 
 export interface PatternData {
   noteCheckIndex: number;
+  completed: boolean;
 
   // eg in this measure
   // 1000
@@ -23,6 +24,7 @@ export interface PatternData {
   containedNotePositionsInMeasure: Array<{
     notePosInMeasure: number;
     measureQuantitization: number;
+    measureNumber: number;
   }>;
 
   quantitization?: number;
@@ -31,8 +33,5 @@ export interface PatternData {
 export interface PatternAnalysis {
   key: string; // urd-candle, etc
   count: number;
-  collection: Map<
-    string,
-    PatternData
-  >;
+  collection: Map<string, PatternData>;
 }
