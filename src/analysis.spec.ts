@@ -4,7 +4,6 @@ import { NoteLine, PatternData } from "./types";
 import {
   analyzePatterns,
   createAnalysisResults,
-  derivePatternQuantitization,
   overlap,
   parse,
 } from "./analysis";
@@ -27,8 +26,7 @@ const data = `0010
 
 describe("parse", () => {
   it("works", () => {
-    const actual = parse(data);
-    let id = 5;
+    let id = 4;
     let pos = 0;
     const empty = (measure: number): NoteLine => {
       id++;
@@ -47,7 +45,7 @@ describe("parse", () => {
       };
     };
 
-    const expected: NoteLine[] = [
+    const m1: NoteLine[] = [
       {
         id: "1",
         notePosInMeasure: 1,
@@ -92,6 +90,9 @@ describe("parse", () => {
         measure: 1,
         quantitization: 4,
       },
+    ];
+
+    const m2: NoteLine[] = [
       empty(2),
       empty(2),
       empty(2),
@@ -102,7 +103,23 @@ describe("parse", () => {
       empty(2),
     ];
 
-    expect(actual).toEqual(expected);
+    const expected: NoteLine[] = [...m1, ...m2];
+
+    const actual = parse(data);
+
+    expect(actual.lines).toEqual(expected);
+    expect(actual.measures).toEqual([
+      {
+        notes: m1,
+        number: 1,
+        quantitization: 4,
+      },
+      {
+        notes: m2,
+        number: 2,
+        quantitization: 8,
+      },
+    ]);
   });
 });
 
@@ -123,7 +140,7 @@ describe("analyzePatterns", () => {
     0100
     0000
     ,`;
-    const lines = parse(data);
+    const { lines } = parse(data);
 
     const patterns: PatternBag = {
       "urd-candle": [up, right, down],
@@ -137,7 +154,7 @@ describe("analyzePatterns", () => {
   });
 
   it("double taps", () => {
-    const lines = parse(`1000
+    const { lines } = parse(`1000
 1000
 1000
 1000
@@ -154,7 +171,7 @@ describe("analyzePatterns", () => {
   });
 
   it("quantitization", () => {
-    const lines = parse(`1000
+    const { lines } = parse(`1000
 0000
 1000
 0000
@@ -179,7 +196,7 @@ describe("analyzePatterns", () => {
   });
 
   it.skip("adds quantitization to pattern", () => {
-    const lines = parse(`1000
+    const { lines } = parse(`1000
 0000
 1000
 0000
@@ -207,12 +224,10 @@ describe("analyzePatterns", () => {
         measureNumber: 1,
       },
     ]);
-
-    expect(identifiedPattern.quantitization).toBe(2);
   });
 
   it("16th candles", () => {
-    const lines = parse(`0010
+    const { lines } = parse(`0010
 0001
 0100
 0010
@@ -241,136 +256,5 @@ describe("analyzePatterns", () => {
     const actual = analyzePatterns(analysis, lines, patterns);
 
     expect(actual).toMatchSnapshot();
-  });
-});
-
-// TODO: this
-describe.skip("derivePatternQuantitization", () => {
-  it("works on basic 4th note jacks", () => {
-    const data: PatternData = {
-      noteCheckIndex: 0,
-      completed: true,
-      containedNotePositionsInMeasure: [
-        {
-          notePosInMeasure: 1,
-          measureQuantitization: 4,
-          measureNumber: 1,
-        },
-        {
-          notePosInMeasure: 2,
-          measureQuantitization: 4,
-          measureNumber: 1,
-        },
-      ],
-    };
-
-    const actual = derivePatternQuantitization(data);
-
-    // "4th" note jacks
-    expect(actual).toBe(4);
-  });
-
-  it("returns correctly across measures", () => {
-    const example = `0000
-0000
-0000
-0000
-0000
-0000
-0000
-1000
-,  // measure 1
-0000
-0001
-0000
-0100
-0000
-0000
-0000
-0000
-,`;
-
-    const data: PatternData = {
-      noteCheckIndex: 0,
-      completed: true,
-      containedNotePositionsInMeasure: [
-        {
-          notePosInMeasure: 8,
-          measureQuantitization: 8,
-          measureNumber: 1,
-        },
-        {
-          notePosInMeasure: 2,
-          measureQuantitization: 8,
-          measureNumber: 2,
-        },
-        {
-          notePosInMeasure: 4,
-          measureQuantitization: 8,
-          measureNumber: 2,
-        },
-      ],
-    };
-
-    const actual = derivePatternQuantitization(data);
-
-    // "4th" note jacks
-    expect(actual).toBe(4);
-  });
-
-  it("returns correctly across uneven measures", () => {
-    const example = `0000
-0000
-0000
-0000
-0000
-0000
-0000
-1000
-,  // measure 1
-0001
-0000
-0010
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-0000
-1000
-,`;
-
-    const data: PatternData = {
-      noteCheckIndex: 0,
-      completed: true,
-      containedNotePositionsInMeasure: [
-        {
-          notePosInMeasure: 8,
-          measureQuantitization: 8,
-          measureNumber: 1,
-        },
-        {
-          notePosInMeasure: 1,
-          measureQuantitization: 16,
-          measureNumber: 2,
-        },
-        {
-          notePosInMeasure: 3,
-          measureQuantitization: 16,
-          measureNumber: 2,
-        },
-      ],
-    };
-
-    const actual = derivePatternQuantitization(data);
-
-    // "4th" note jacks
-    expect(actual).toBe(8);
   });
 });

@@ -1,6 +1,11 @@
-import { isNumberObject } from "util/types";
-import { PatternBag, up } from "./patterns";
-import { ContainedNote, NoteLine, PatternAnalysis, PatternData } from "./types";
+import type { PatternBag } from "./patterns";
+import type {
+  ContainedNote,
+  Measure,
+  NoteLine,
+  PatternAnalysis,
+  PatternData,
+} from "./types";
 
 function getQuantitization(data: string[]) {
   let count = 0;
@@ -13,19 +18,31 @@ function getQuantitization(data: string[]) {
   return count;
 }
 
-export function parse(data: string) {
+export function parse(data: string): {
+  lines: NoteLine[];
+  measures: Measure[];
+} {
   const notes: NoteLine[] = [];
   const lines = data.split("\n");
+  const measures: Measure[] = [];
 
   let measure = 1;
   let measureQuantitization: number = 0;
   let newMeasure = true;
   let notePosInMeasure = 1;
+  let id = 1;
+
+  let currentMeasure: Measure = {
+    number: measure,
+    notes: [],
+    quantitization: 0,
+  };
 
   for (const d in lines) {
     const datum = lines[d].trim();
 
     if (datum === ",") {
+      measures.push(currentMeasure);
       measure++;
       notePosInMeasure = 1;
       newMeasure = true;
@@ -35,10 +52,15 @@ export function parse(data: string) {
     if (newMeasure) {
       measureQuantitization = getQuantitization(lines.slice(parseInt(d, 10)));
       newMeasure = false;
+      currentMeasure = {
+        quantitization: measureQuantitization,
+        number: measure,
+        notes: [],
+      };
     }
 
     const line: NoteLine = {
-      id: (parseInt(d, 10) + 1).toString(),
+      id: id.toString(),
       notePosInMeasure,
       raw: datum,
       left: datum[0] === "1",
@@ -50,11 +72,12 @@ export function parse(data: string) {
     };
 
     notes.push(line);
-
+    currentMeasure.notes.push(line);
+    id++;
     notePosInMeasure++;
   }
 
-  return notes;
+  return { lines: notes, measures };
 }
 
 export const createAnalysisResults = (patterns: PatternBag) => {
@@ -160,7 +183,6 @@ export function analyzePatterns(
     for (const [k, found] of values[key].collection) {
       values[key].collection.set(k, {
         ...found,
-        quantitization: derivePatternQuantitization(found),
       });
     }
   }
@@ -168,116 +190,10 @@ export function analyzePatterns(
   return values;
 }
 
-export function derivePatternQuantitization(
-  data: PatternData
-): number | undefined {
-  const { smallestQuantitization, largestQuantitization } =
-    data.containedNotePositionsInMeasure.reduce(
-      (acc, curr) => {
-        if (curr.measureQuantitization > acc.smallestQuantitization) {
-          acc.largestQuantitization = curr.measureQuantitization;
-        }
-
-        if (curr.measureQuantitization < acc.smallestQuantitization) {
-          acc.smallestQuantitization = curr.measureQuantitization;
-        }
-
-        return acc;
-      },
-      {
-        smallestQuantitization: Number.POSITIVE_INFINITY,
-        largestQuantitization: 0,
-      }
-    );
-
-  // eg 11 and 12, etc.
-  // these will always be 1 whole number different, we don't
-  // care about a pattern that spans more than two measures.
-  const uniqMeasureNumbers = data.containedNotePositionsInMeasure.reduce<
-    Array<{ quan: number; measureNumber: number }>
-  >((acc, curr) => {
-    if (acc.some((x) => x.measureNumber === curr.measureNumber)) {
-      return acc;
-    }
-    return acc.concat({
-      measureNumber: curr.measureNumber,
-      quan: curr.measureQuantitization,
-    });
-  }, []);
-
-  // change measures 12 and 13 to 1 and 2 for convinience.
-  let notes = data.containedNotePositionsInMeasure.map<
-    ContainedNote & { shouldNormalize: boolean; id: number }
-  >((x, id) => {
-    return {
-      ...x,
-      id,
-      measureNumber:
-        x.measureNumber === uniqMeasureNumbers[0].measureNumber ? 1 : 2,
-      shouldNormalize: x.measureQuantitization === largestQuantitization,
-    };
-  });
-
-  // eg 16/8 = 2
-  const divisor = largestQuantitization / smallestQuantitization;
-
-  // 0, 2, 4, 6, 8, 10, 12, 14
-  const positions: number[] = [];
-  for (let j = 0; j < largestQuantitization / divisor; j++) {
-    const notePosToModify = j * divisor + 1;
-    positions.push(notePosToModify);
+export function addPatternDataToMeasures (measures: Measure[], data: Record<string, PatternAnalysis>) {
+  for (const [k, v] of Object.entries(data)) {
+    // for (const col of v.collection.entries()) {
+    // }
+    // measures[v.
   }
-
-  const updatedNotes: typeof notes = [];
-
-  for (const pos of positions) {
-    const notePosToModify = pos; // j * divisor + 1;
-    const noteToNormalize = notes.find((x) => {
-      return x.shouldNormalize && x.notePosInMeasure === notePosToModify;
-    });
-
-    if (!noteToNormalize) {
-      continue;
-    }
-
-    const offset =
-      positions.findIndex((x) => x === noteToNormalize.notePosInMeasure)! *
-      (largestQuantitization / smallestQuantitization - 1);
-    const newNotePos =
-      noteToNormalize.notePosInMeasure + smallestQuantitization - offset;
-
-    updatedNotes.push({
-      ...noteToNormalize,
-      notePosInMeasure: newNotePos,
-    });
-  }
-
-  for (const n of updatedNotes) {
-    const idx = notes.findIndex((x) => x.id === n.id)!;
-    notes[idx] = n;
-  }
-
-  // // 3. smallest quantitization / (n2.pos - n1.pos) to get difference
-  let diff: number | undefined;
-
-  for (let i = notes.length; i > 0; i--) {
-    const n2 = notes[i - 1];
-    const n1 = notes[i - 2];
-
-    if (!n1) {
-      return smallestQuantitization;
-    }
-
-    if (!diff) {
-      diff = n2.notePosInMeasure - n1.notePosInMeasure;
-    } else {
-      const nextDiff = n2.notePosInMeasure - n1.notePosInMeasure;
-
-      if (nextDiff !== diff) {
-        return undefined;
-      }
-    }
-  }
-
-  return smallestQuantitization;
 }

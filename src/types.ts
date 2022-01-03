@@ -10,6 +10,12 @@ export interface NoteLine {
   quantitization: number; // 4th, 8th etc.
 }
 
+export interface Measure {
+  number: number
+  quantitization: number
+  notes: NoteLine[]
+}
+
 export interface ContainedNote {
   notePosInMeasure: number;
   measureQuantitization: number;
@@ -28,8 +34,6 @@ export interface PatternData {
   // a three note jackhammer of 4ths would contain note 1, 2, 3.
   // useful for building a nice UI to visualize the patterns.
   containedNotePositionsInMeasure: ContainedNote[]
-
-  quantitization?: number;
 }
 
 export interface PatternAnalysis {

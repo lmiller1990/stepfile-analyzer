@@ -1,5 +1,4 @@
 import fs from "fs";
-import util from "util";
 import path from "path";
 import { parse, analyzePatterns, createAnalysisResults } from "./src/analysis";
 import { patterns } from "./src/patterns";
@@ -15,7 +14,7 @@ const data = fs.readFileSync(
 
 const parsed = parse(data);
 const values = createAnalysisResults(patterns);
-const analysis = analyzePatterns(values, parsed, patterns);
+const analysis = analyzePatterns(values, parsed.lines, patterns);
 
 for (const pattern of Object.keys(patterns)) {
   const data = analysis[pattern].collection;
