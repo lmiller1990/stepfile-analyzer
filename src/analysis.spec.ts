@@ -120,6 +120,8 @@ describe("parse", () => {
         quantitization: 8,
       },
     ]);
+
+    expect(actual).toMatchSnapshot()
   });
 });
 
