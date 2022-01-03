@@ -1,5 +1,6 @@
-import type { PatternBag } from "./patterns";
-import type { NoteLine, PatternAnalysis, PatternData } from "./types";
+import { isNumberObject } from "util/types";
+import { PatternBag, up } from "./patterns";
+import { ContainedNote, NoteLine, PatternAnalysis, PatternData } from "./types";
 
 function getQuantitization(data: string[]) {
   let count = 0;
@@ -22,7 +23,7 @@ export function parse(data: string) {
   let notePosInMeasure = 1;
 
   for (const d in lines) {
-    const datum = lines[d];
+    const datum = lines[d].trim();
 
     if (datum === ",") {
       measure++;
@@ -170,44 +171,113 @@ export function analyzePatterns(
 export function derivePatternQuantitization(
   data: PatternData
 ): number | undefined {
-  let diff: number | undefined;
+  const { smallestQuantitization, largestQuantitization } =
+    data.containedNotePositionsInMeasure.reduce(
+      (acc, curr) => {
+        if (curr.measureQuantitization > acc.smallestQuantitization) {
+          acc.largestQuantitization = curr.measureQuantitization;
+        }
 
-  for (let i = data.containedNotePositionsInMeasure.length; i > 0; i--) {
-    const n2 = data.containedNotePositionsInMeasure[i - 1];
-    const n1 = data.containedNotePositionsInMeasure[i - 2];
+        if (curr.measureQuantitization < acc.smallestQuantitization) {
+          acc.smallestQuantitization = curr.measureQuantitization;
+        }
 
-    if (!n1) {
-      return diff;
+        return acc;
+      },
+      {
+        smallestQuantitization: Number.POSITIVE_INFINITY,
+        largestQuantitization: 0,
+      }
+    );
+
+  // eg 11 and 12, etc.
+  // these will always be 1 whole number different, we don't
+  // care about a pattern that spans more than two measures.
+  const uniqMeasureNumbers = data.containedNotePositionsInMeasure.reduce<
+    Array<{ quan: number; measureNumber: number }>
+  >((acc, curr) => {
+    if (acc.some((x) => x.measureNumber === curr.measureNumber)) {
+      return acc;
+    }
+    return acc.concat({
+      measureNumber: curr.measureNumber,
+      quan: curr.measureQuantitization,
+    });
+  }, []);
+
+  // change measures 12 and 13 to 1 and 2 for convinience.
+  let notes = data.containedNotePositionsInMeasure.map<
+    ContainedNote & { shouldNormalize: boolean; id: number }
+  >((x, id) => {
+    return {
+      ...x,
+      id,
+      measureNumber:
+        x.measureNumber === uniqMeasureNumbers[0].measureNumber ? 1 : 2,
+      shouldNormalize: x.measureQuantitization === largestQuantitization,
+    };
+  });
+
+  // eg 16/8 = 2
+  const divisor = largestQuantitization / smallestQuantitization;
+
+  // 0, 2, 4, 6, 8, 10, 12, 14
+  const positions: number[] = [];
+  for (let j = 0; j < largestQuantitization / divisor; j++) {
+    const notePosToModify = j * divisor + 1;
+    positions.push(notePosToModify);
+  }
+
+  const updatedNotes: typeof notes = [];
+
+  for (const pos of positions) {
+    const notePosToModify = pos; // j * divisor + 1;
+    const noteToNormalize = notes.find((x) => {
+      return x.shouldNormalize && x.notePosInMeasure === notePosToModify;
+    });
+
+    if (!noteToNormalize) {
+      continue;
     }
 
-    // TODO: case of pattern overlapping two measures with diff
-    // quantitizations.
-    // undefined for now since it's complex.
-    if (n2.measureQuantitization !== n1.measureQuantitization) {
-      return undefined;
+    const offset =
+      positions.findIndex((x) => x === noteToNormalize.notePosInMeasure)! *
+      (largestQuantitization / smallestQuantitization - 1);
+    const newNotePos =
+      noteToNormalize.notePosInMeasure + smallestQuantitization - offset;
+
+    updatedNotes.push({
+      ...noteToNormalize,
+      notePosInMeasure: newNotePos,
+    });
+  }
+
+  for (const n of updatedNotes) {
+    const idx = notes.findIndex((x) => x.id === n.id)!;
+    notes[idx] = n;
+  }
+
+  // // 3. smallest quantitization / (n2.pos - n1.pos) to get difference
+  let diff: number | undefined;
+
+  for (let i = notes.length; i > 0; i--) {
+    const n2 = notes[i - 1];
+    const n1 = notes[i - 2];
+
+    if (!n1) {
+      return smallestQuantitization;
     }
 
     if (!diff) {
-      diff =
-        n2.measureQuantitization / (n2.notePosInMeasure - n1.notePosInMeasure);
+      diff = n2.notePosInMeasure - n1.notePosInMeasure;
     } else {
-      const nextDiff =
-        n2.measureQuantitization / (n2.notePosInMeasure - n1.notePosInMeasure);
+      const nextDiff = n2.notePosInMeasure - n1.notePosInMeasure;
 
-      // pattern is not "consistent"
-      // eg we might have a 3 note left jack:
-      // 1000
-      // 1000
-      // 0000
-      // 1000
-      // but it's not really what you'd call a jack - those are supposed to
-      // consistently have the same amount of time between each.
-      // this is more like a broken 3 left arrow jack, which we don't really care about.
       if (nextDiff !== diff) {
         return undefined;
       }
     }
   }
 
-  return diff;
+  return smallestQuantitization;
 }
