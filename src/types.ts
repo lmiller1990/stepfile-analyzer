@@ -10,10 +10,16 @@ export interface NoteLine {
   quantitization: number; // 4th, 8th etc.
 }
 
-export interface Measure {
+export interface Measure<T = NoteLine> {
   number: number
   quantitization: number
-  notes: NoteLine[]
+  notes: T[]
+}
+
+export interface NoteLineWithPatternData extends NoteLine {
+  // pattern which this note line is part of
+  // for example Set ("ulr-candle", "ll-tap")
+  patterns: Set<string>
 }
 
 export interface ContainedNote {

@@ -1,7 +1,13 @@
 import { describe, it, expect } from "vitest";
 
-import { NoteLine, PatternData } from "./types";
 import {
+  Measure,
+  NoteLine,
+  NoteLineWithPatternData,
+  PatternData,
+} from "./types";
+import {
+  addPatternDataToMeasures,
   analyzePatterns,
   createAnalysisResults,
   overlap,
@@ -121,7 +127,7 @@ describe("parse", () => {
       },
     ]);
 
-    expect(actual).toMatchSnapshot()
+    expect(actual).toMatchSnapshot();
   });
 });
 
@@ -258,5 +264,38 @@ describe("analyzePatterns", () => {
     const actual = analyzePatterns(analysis, lines, patterns);
 
     expect(actual).toMatchSnapshot();
+  });
+});
+
+describe.only("addPatternDataToMeasures", () => {
+  it("adds pattern metadata to notes in measures", () => {
+    const { lines, measures } = parse(`0000
+0010
+1000
+0100
+,`);
+
+    const patterns: PatternBag = {
+      "uld-candle": [up, left, down],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+    const data = analyzePatterns(analysis, lines, patterns);
+
+    const actual = addPatternDataToMeasures(measures, data);
+    const expected: Measure<NoteLineWithPatternData>[] = [
+      {
+        notes: [
+          { ...lines[0], patterns: new Set() },
+          { ...lines[1], patterns: new Set(["uld-candle"]) },
+          { ...lines[2], patterns: new Set(["uld-candle"]) },
+          { ...lines[3], patterns: new Set(["uld-candle"]) },
+        ],
+        quantitization: 4,
+        number: 1,
+      },
+    ];
+
+    expect(actual).toEqual(expected);
   });
 });

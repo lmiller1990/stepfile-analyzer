@@ -3,6 +3,7 @@ import type {
   ContainedNote,
   Measure,
   NoteLine,
+  NoteLineWithPatternData,
   PatternAnalysis,
   PatternData,
 } from "./types";
@@ -190,10 +191,31 @@ export function analyzePatterns(
   return values;
 }
 
-export function addPatternDataToMeasures (measures: Measure[], data: Record<string, PatternAnalysis>) {
-  for (const [k, v] of Object.entries(data)) {
-    // for (const col of v.collection.entries()) {
-    // }
-    // measures[v.
+export function addPatternDataToMeasures(
+  measures: Measure[],
+  data: Record<string, PatternAnalysis>
+): Measure<NoteLineWithPatternData>[] {
+  const measuresWithMetadata: Measure<NoteLineWithPatternData>[] = measures.map(
+    (x) => {
+      return {
+        ...x,
+        notes: x.notes.map<NoteLineWithPatternData>((y) => ({
+          ...y,
+          patterns: new Set<string>(),
+        })),
+      };
+    }
+  );
+
+  for (const [pattern, analysis] of Object.entries(data)) {
+    for (const [_, val] of analysis.collection) {
+      for (const note of val.containedNotePositionsInMeasure) {
+        measuresWithMetadata[note.measureNumber - 1].notes[
+          note.notePosInMeasure - 1
+        ].patterns.add(pattern);
+      }
+    }
   }
+
+  return measuresWithMetadata;
 }
