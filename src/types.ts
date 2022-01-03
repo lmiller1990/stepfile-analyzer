@@ -16,6 +16,8 @@ export interface Measure<T = NoteLine> {
   notes: T[]
 }
 
+export type Direction = "left" | "right" | "up" | "down";
+
 export interface NoteLineWithPatternData extends NoteLine {
   // pattern which this note line is part of
   // for example Set ("ulr-candle", "ll-tap")

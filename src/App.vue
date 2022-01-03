@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { analyzePatterns, createAnalysisResults, parse } from './analysis'
-import { patterns } from './patterns';
+import { ref } from "vue";
+import {
+  addPatternDataToMeasures,
+  analyzePatterns,
+  createAnalysisResults,
+  parse,
+} from "./analysis";
+import { patterns } from "./patterns";
+import { Direction, NoteLineWithPatternData } from "./types";
 
 const raw = `0010
 0001
@@ -15,8 +21,8 @@ const raw = `0010
 0001
 0010
 0000
-0000
-0000
+1000
+1000
 0000
 0000
 ,
@@ -29,52 +35,72 @@ const raw = `0010
 1000
 0010
 ,
-`
+`;
 
-const data = parse(raw)
-console.log(data)
-const analysis = analyzePatterns(createAnalysisResults(patterns), data.lines, patterns)
-console.log(analysis)
+const data = parse(raw);
+const analysis = analyzePatterns(
+  createAnalysisResults(patterns),
+  data.lines,
+  patterns
+);
+const measures = addPatternDataToMeasures(data.measures, analysis);
 
-const selectedPattern = ref<string>("urd-candle")
+const selectedPattern = ref<string>("urd-candle");
+
+const positions = new Map<Direction, number>([
+  ["left", 0],
+  ["down", 1],
+  ["up", 2],
+  ["right", 3],
+]);
+
+const style = (note: NoteLineWithPatternData, direction: Direction) => {
+  return {
+    left: `${(100 / 4) * positions.get(direction)!}px`,
+    background: note.patterns.has(selectedPattern.value) ? 'red' : 'white'
+  }
+};
+
 </script>
 
 <template>
-  <div class="measure" v-for="measure of data.measures" :key="measure.number"> 
-    <div 
-      v-for="line of measure.quantitization" 
+  <div class="measure" v-for="measure of measures" :key="measure.number">
+    <div
+      v-for="line of measure.quantitization"
       class="line"
       :key="line"
-      :style="{ top: `${(400 / measure.quantitization) * (line - 1)}px`}"
+      :style="{
+        top: `${(400 / measure.quantitization) * (line - 1)}px`,
+      }"
     >
-      <div 
+      <div
         v-if="measure.notes[line - 1].left"
         class="note"
-        :style="`left: ${(100 / 4) * 0}px`"
+        :style="style(measure.notes[line - 1], 'left')"
       >
         {{ "<" }}
       </div>
 
-      <div 
+      <div
         v-if="measure.notes[line - 1].down"
         class="note"
-        :style="`left: ${(100 / 4) * 1}px`"
+        :style="style(measure.notes[line - 1], 'down')"
       >
         {{ "v" }}
       </div>
 
-      <div 
+      <div
         v-if="measure.notes[line - 1].up"
         class="note"
-        :style="`left: ${(100 / 4) * 2}px`"
+        :style="style(measure.notes[line - 1], 'up')"
       >
         {{ "^" }}
       </div>
 
-      <div 
-        v-if="measure.notes[line - 1].right" 
+      <div
+        v-if="measure.notes[line - 1].right"
         class="note"
-        :style="`left: ${(100 / 4) * 3}px`"
+        :style="style(measure.notes[line - 1], 'right')"
       >
         {{ ">" }}
       </div>
@@ -82,11 +108,8 @@ const selectedPattern = ref<string>("urd-candle")
   </div>
 
   <h1>Patterns</h1>
-    <div
-      v-for="[name, obj] of Object.entries(patterns)" 
-      :key="name"
-    >
-    <input :id="name" :value="name" type="radio" v-model="selectedPattern">
+  <div v-for="[name, obj] of Object.entries(patterns)" :key="name">
+    <input :id="name" :value="name" type="radio" v-model="selectedPattern" />
     <label :for="name">{{ name }}</label>
   </div>
 </template>
@@ -98,6 +121,9 @@ const selectedPattern = ref<string>("urd-candle")
 
 .line {
   position: absolute;
+  border-bottom: 1px dashed black;
+  display: flex;
+  width: 100%;
 }
 
 .measure {
