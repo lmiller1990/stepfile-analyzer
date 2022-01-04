@@ -11,7 +11,7 @@ import type {
 function getQuantitization(data: string[]) {
   let count = 0;
   for (const line of data) {
-    if (line === ",") {
+    if (line.startsWith(",")) {
       return count;
     }
     count++;
@@ -42,7 +42,7 @@ export function parse(data: string): {
   for (const d in lines) {
     const datum = lines[d].trim();
 
-    if (datum === ",") {
+    if (datum.startsWith(",")) {
       measures.push(currentMeasure);
       measure++;
       notePosInMeasure = 1;

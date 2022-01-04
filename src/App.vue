@@ -8,34 +8,38 @@ import {
 } from "./analysis";
 import { patterns } from "./patterns";
 import { Direction, NoteLineWithPatternData } from "./types";
+import { chart } from "./chart";
+import Arrow from "./Arrow.vue";
 
-const raw = `0010
-0001
-0100
-0010
-1000
-0100
-1000
-0010
-0100
-0001
-0010
-0000
-1000
-1000
-0000
-0000
-,
-0010
-0001
-0100
-0010
-1000
-0100
-1000
-0010
-,
-`;
+// const raw = `0010
+// 0001
+// 0100
+// 0010
+// 1000
+// 0100
+// 1000
+// 0010
+// 0100
+// 0001
+// 0010
+// 0000
+// 1000
+// 1000
+// 0000
+// 0000
+// ,
+// 0010
+// 0001
+// 0100
+// 0010
+// 1000
+// 0100
+// 1000
+// 0010
+// ,
+// `;
+
+const raw = chart;
 
 const data = parse(raw);
 const analysis = analyzePatterns(
@@ -54,23 +58,32 @@ const positions = new Map<Direction, number>([
   ["right", 3],
 ]);
 
+const measureWidth = 100;
+const measureHeight = 400;
+
 const style = (note: NoteLineWithPatternData, direction: Direction) => {
   return {
-    left: `${(100 / 4) * positions.get(direction)!}px`,
-    background: note.patterns.has(selectedPattern.value) ? 'red' : 'white'
-  }
+    left: `${(measureWidth / 4) * positions.get(direction)!}px`,
+    width: `${measureWidth / 4}px`,
+    height: `${measureHeight / 16}`,
+    background: note.patterns.has(selectedPattern.value) ? "red" : "none",
+  };
 };
-
 </script>
 
 <template>
-  <div class="measure" v-for="measure of measures" :key="measure.number">
+  <div
+    class="measure"
+    v-for="measure of measures"
+    :key="measure.number"
+    :style="{ height: `${measureHeight}px`, width: `${measureWidth}px` }"
+  >
     <div
       v-for="line of measure.quantitization"
       class="line"
       :key="line"
       :style="{
-        top: `${(400 / measure.quantitization) * (line - 1)}px`,
+        top: `${(measureHeight / measure.quantitization) * (line - 1)}px`,
       }"
     >
       <div
@@ -78,7 +91,7 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'left')"
       >
-        {{ "<" }}
+        <Arrow direction="left" />
       </div>
 
       <div
@@ -86,7 +99,7 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'down')"
       >
-        {{ "v" }}
+        <Arrow direction="down" />
       </div>
 
       <div
@@ -94,7 +107,7 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'up')"
       >
-        {{ "^" }}
+        <Arrow direction="up" />
       </div>
 
       <div
@@ -102,7 +115,7 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'right')"
       >
-        {{ ">" }}
+        <Arrow direction="right" />
       </div>
     </div>
   </div>
@@ -117,6 +130,7 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
 <style scoped>
 .note {
   position: absolute;
+  background: blue;
 }
 
 .line {
@@ -128,8 +142,12 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
 
 .measure {
   position: relative;
-  height: 400px;
-  width: 100px;
+  /* height: 400px;
+  width: 100px; */
   border: 1px solid black;
+}
+
+* {
+  box-sizing: content-box;
 }
 </style>
