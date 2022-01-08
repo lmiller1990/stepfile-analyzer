@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { rootCertificates } from "tls";
 import type { Direction } from "./types";
 
 const props = defineProps<{
@@ -21,6 +22,10 @@ switch (props.direction) {
     rotation = "0deg";
     break;
 }
+
+const style = {
+  transform: `rotate(${rotation})`
+}
 </script>
 
 <template>
@@ -28,7 +33,7 @@ switch (props.direction) {
     viewBox="0 0 100 100"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
-    :style="{ rotate: rotation }"
+    :style="style"
   >
     <path d="M0 45H95V55H0V45Z" fill="black" />
     <path
