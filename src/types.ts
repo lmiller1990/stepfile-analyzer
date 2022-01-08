@@ -32,7 +32,7 @@ export interface NoteLineWithPatternData extends NoteLine {
 
 export interface ContainedNote {
   notePosInMeasure: number;
-  measureQuantitization: number;
+  measureQuantitization: Quantitization;
   noteQuantitization: Quantitization;
   measureNumber: number;
 }

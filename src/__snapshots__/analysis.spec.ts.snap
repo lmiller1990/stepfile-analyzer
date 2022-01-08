@@ -1,6 +1,6 @@
 // Vitest Snapshot v1
 
-exports[`analyzePatterns > 16th candles 1`] = `
+exports[`16th candles 1`] = `
 {
   "dlu-candle": {
     "collection": Map {

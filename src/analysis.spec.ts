@@ -10,6 +10,7 @@ import {
   addPatternDataToMeasures,
   analyzePatterns,
   createAnalysisResults,
+  createVirtualizedMeasure,
   overlap,
   parse,
 } from "./analysis";
@@ -34,8 +35,8 @@ describe("parse", () => {
   it("works", () => {
     const actual = parse(data);
 
-    expect(actual.lines).toMatchSnapshot()
-    expect(actual.measures).toMatchSnapshot()
+    expect(actual.lines).toMatchSnapshot();
+    expect(actual.measures).toMatchSnapshot();
   });
 });
 
@@ -69,10 +70,11 @@ describe("analyzePatterns", () => {
     expect(actual["urd-candle"].count).toBe(1);
     expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("1")!
+    const pattern = actual["urd-candle"].collection.get("1")!;
 
-    expect(pattern.patternQuantitization).toBe(4)
+    expect(pattern.patternQuantitization).toBe(4);
   });
+})
 
   it("works across measures with same quantitization", () => {
     const data = `0000
@@ -99,12 +101,12 @@ describe("analyzePatterns", () => {
     expect(actual["urd-candle"].count).toBe(1);
     expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("3")!
+    const pattern = actual["urd-candle"].collection.get("3")!;
 
-    expect(pattern.patternQuantitization).toBe(4)
+    expect(pattern.patternQuantitization).toBe(4);
   });
 
-  it("works across measures with different quantitization, m1 > m2", () => {
+  it.skip("works across measures with different quantitization, m1 > m2", () => {
     const data = `0000
     0000
     0000
@@ -133,9 +135,9 @@ describe("analyzePatterns", () => {
     expect(actual["urd-candle"].count).toBe(1);
     expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("7")!
+    const pattern = actual["urd-candle"].collection.get("7")!;
 
-    expect(pattern.patternQuantitization).toBe(8)
+    expect(pattern.patternQuantitization).toBe(8);
   });
 
   it("works across measures with different quantitization, m1 < m2", () => {
@@ -167,9 +169,9 @@ describe("analyzePatterns", () => {
     expect(actual["urd-candle"].count).toBe(1);
     expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("3")!
+    const pattern = actual["urd-candle"].collection.get("3")!;
 
-    expect(pattern.patternQuantitization).toBe(4)
+    expect(pattern.patternQuantitization).toBe(4);
   });
 
   it("detects uneven pattern, m1 > m2", () => {
@@ -201,23 +203,23 @@ describe("analyzePatterns", () => {
     expect(actual["urd-candle"].count).toBe(1);
     expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("7")!
+    const pattern = actual["urd-candle"].collection.get("7")!;
 
-    expect(pattern.patternQuantitization).toBe(0)
+    expect(pattern.patternQuantitization).toBe(0);
   });
 
   it("detects uneven pattern, m1 < m2", () => {
     const data = `0000
     0000
     0000
-    0000
-    0000
-    0000
-    0010
     0001
     ,
+    0001
     0000
-    0100
+    0001
+    0000
+    0001
+    0000
     0000
     0000
     ,`;
@@ -225,19 +227,19 @@ describe("analyzePatterns", () => {
     const { lines, measures } = parse(data);
 
     const patterns: PatternBag = {
-      "urd-candle": [up, right, down],
+      "rrrr-jack": [right, right, right, right],
     };
 
     const analysis = createAnalysisResults(patterns);
 
     const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual["urd-candle"].count).toBe(1);
-    expect(actual["urd-candle"].count).toBe(1);
+    expect(actual["rrrr-jack"].count).toBe(1);
+    expect(actual["rrrr-jack"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("7")!
+    const pattern = actual["rrrr-jack"].collection.get("4")!;
 
-    expect(pattern.patternQuantitization).toBe(0)
+    expect(pattern.patternQuantitization).toBe(4);
   });
 
   it("double taps", () => {
@@ -256,6 +258,53 @@ describe("analyzePatterns", () => {
 
     expect(actual["ll"].count).toBe(3);
   });
+
+//   // HERE
+//   it("sweep pattern across measures", () => {
+//     const chart = `0000
+// 0000
+// 0000
+// 0000
+// 0000
+// 0000
+// 1000
+// 0100
+// ,  // measure 3
+// 0010
+// 0000
+// 0001
+// 0000
+// 1000
+// 0010
+// 0100
+// 0001
+// 0010
+// 0100
+// 0001
+// 0010
+// 1000
+// 0001
+// 1000
+// 0001
+// ,`;
+//     const { lines, measures } = parse(chart);
+
+//     const k = "ldur-sweep";
+//     const patterns: PatternBag = {
+//       [k]: [left, down, up, right],
+//     };
+
+//     const analysis = createAnalysisResults(patterns);
+
+//     const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+//     expect(actual[k].count).toBe(1);
+//     expect(actual[k].count).toBe(1);
+
+//     const pattern = actual[k].collection.get("7")!;
+
+//     expect(pattern.patternQuantitization).toBe(8);
+//   });
 
   it("quantitization", () => {
     const { lines, measures } = parse(`1000
@@ -313,7 +362,7 @@ describe("analyzePatterns", () => {
 
     expect(actual).toMatchSnapshot();
   });
-});
+// });
 
 describe("addPatternDataToMeasures", () => {
   it("adds pattern metadata to notes in measures", () => {
@@ -356,14 +405,14 @@ describe("getQuantitization", () => {
 0100
 ,`);
 
-    expect(lines[0].measureQuantitization).toBe(4)
-    expect(lines[0].noteQuantitization).toBe(4)
-    expect(lines[1].measureQuantitization).toBe(4)
-    expect(lines[1].noteQuantitization).toBe(4)
-    expect(lines[2].measureQuantitization).toBe(4)
-    expect(lines[2].noteQuantitization).toBe(4)
-    expect(lines[3].measureQuantitization).toBe(4)
-    expect(lines[3].noteQuantitization).toBe(4)
+    expect(lines[0].measureQuantitization).toBe(4);
+    expect(lines[0].noteQuantitization).toBe(4);
+    expect(lines[1].measureQuantitization).toBe(4);
+    expect(lines[1].noteQuantitization).toBe(4);
+    expect(lines[2].measureQuantitization).toBe(4);
+    expect(lines[2].noteQuantitization).toBe(4);
+    expect(lines[3].measureQuantitization).toBe(4);
+    expect(lines[3].noteQuantitization).toBe(4);
   });
 
   it("8ths", () => {
@@ -377,16 +426,69 @@ describe("getQuantitization", () => {
 0000
 ,`);
 
-    expect(lines[0].noteQuantitization).toBe(4)
-    expect(lines[1].noteQuantitization).toBe(8)
+    expect(lines[0].noteQuantitization).toBe(4);
+    expect(lines[1].noteQuantitization).toBe(8);
 
-    expect(lines[2].noteQuantitization).toBe(4)
-    expect(lines[3].noteQuantitization).toBe(8)
+    expect(lines[2].noteQuantitization).toBe(4);
+    expect(lines[3].noteQuantitization).toBe(8);
 
-    expect(lines[4].noteQuantitization).toBe(4)
-    expect(lines[5].noteQuantitization).toBe(8)
+    expect(lines[4].noteQuantitization).toBe(4);
+    expect(lines[5].noteQuantitization).toBe(8);
 
-    expect(lines[6].noteQuantitization).toBe(4)
-    expect(lines[7].noteQuantitization).toBe(8)
+    expect(lines[6].noteQuantitization).toBe(4);
+    expect(lines[7].noteQuantitization).toBe(8);
+  });
+});
+
+describe("createVirtualizedMeasure", () => {
+  it("m1.quantization less than m2", () => {
+    const actual = createVirtualizedMeasure(
+      [1, 2],
+      [
+        {
+          notePosInMeasure: 7,
+          measureQuantitization: 8,
+          noteQuantitization: 4,
+          measureNumber: 1,
+        },
+        {
+          notePosInMeasure: 8,
+          measureQuantitization: 8,
+          noteQuantitization: 8,
+          measureNumber: 1,
+        },
+        {
+          notePosInMeasure: 1,
+          measureQuantitization: 16,
+          noteQuantitization: 4,
+          measureNumber: 2,
+        },
+        {
+          notePosInMeasure: 3,
+          measureQuantitization: 16,
+          noteQuantitization: 8,
+          measureNumber: 2,
+        },
+        {
+          notePosInMeasure: 5,
+          measureQuantitization: 16,
+          noteQuantitization: 8,
+          measureNumber: 2,
+        },
+        {
+          notePosInMeasure: 7,
+          measureQuantitization: 16,
+          noteQuantitization: 8,
+          measureNumber: 2,
+        },
+      ]
+    );
+
+    expect(actual[0].notePosInMeasure).toBe(7);
+    expect(actual[1].notePosInMeasure).toBe(8);
+    expect(actual[2].notePosInMeasure).toBe(9);
+    expect(actual[3].notePosInMeasure).toBe(10);
+    expect(actual[4].notePosInMeasure).toBe(11);
+    expect(actual[5].notePosInMeasure).toBe(12);
   });
 });

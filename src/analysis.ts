@@ -1,5 +1,5 @@
 import { QuantitizationError } from "./errors";
-import { noteData, Quantitization, quantitization } from "./noteData";
+import { noteData, Quantitization, quantitization, highestCommonDenominator } from "./noteData";
 import type { PatternBag } from "./patterns";
 import type {
   ContainedNote,
@@ -290,23 +290,39 @@ function getHighestQuantitization(notes: ContainedNote[]): Quantitization {
   return Math.max(...notes.map((x) => x.noteQuantitization)) as Quantitization;
 }
 
-function createVirtualizedMeasure(
+function largestQuantizationInMeasure(measure: number, notes: ContainedNote[]) {
+  return notes.reduce((acc, curr) => {
+    if (curr.measureNumber === measure && curr.noteQuantitization > acc) {
+      return curr.noteQuantitization;
+    }
+    return acc;
+  }, 0);
+}
+
+export function createVirtualizedMeasure(
   measureNums: [number, number],
   containedNotePositionsInMeasure: ContainedNote[]
-) {
+): ContainedNote[] {
   const [m1, m2] = measureNums.sort();
   const m1Notes = containedNotePositionsInMeasure.filter(
     (x) => x.measureNumber === m1
+  );
+
+  const m2Notes = containedNotePositionsInMeasure.filter(
+    (x) => x.measureNumber === m2
   );
 
   const lastNoteOfFirstMeasure = m1Notes.reduce((acc, curr) => {
     return curr.notePosInMeasure > acc.notePosInMeasure ? curr : acc;
   }, m1Notes[0]);
 
-  // merge into a single virtual measure
-  // this means notes from m2 have their position in the measure increased
-  // by the last note in m1
-  // eg
+  // Merge into a single virtual measure.
+  // This means notes from m2 have their position in the measure increased.
+  // If the measures have different quantization, it's a bit more complex, since
+  // we need to remove notes from the largest measure and adjust the note positions
+  // accordingly.
+
+  // case: same quantization
   // 0000
   // 0000
   // 1000 pos: 3
@@ -317,16 +333,101 @@ function createVirtualizedMeasure(
   // 0000
   // 0000
   // then we just see if they are sequential like in case 1
-  return containedNotePositionsInMeasure.map((x) => {
-    if (x.measureNumber === m1) {
-      return x;
+  const m1Quan = m1Notes[0].measureQuantitization 
+  const m2Quan = m2Notes[0].measureQuantitization
+
+  if (m1Quan === m2Quan) {
+    return containedNotePositionsInMeasure.map((x) => {
+      if (x.measureNumber === m1) {
+        return x;
+      }
+      return {
+        ...x,
+        notePosInMeasure:
+          x.notePosInMeasure + lastNoteOfFirstMeasure.notePosInMeasure,
+      };
+    });
+  }
+
+  // Case: m1 quantization (8) less than m2 quantization (16)
+  // We need to normalize the quantitization to q where q is
+  // the highest quantitization in the pattern (in this case it would
+  // an 8th).
+  // This means in the second measure we remove all the non 4th and 8th notes,
+  // and adjust the note position.
+  // q=8 -> q=16 would be like this... we remove every 2nd note.
+
+  // 0100 "4th note" (pos: 1 -> pos: 1)
+  // 0000 "16th note" <- remove
+  // 1000 "8th note" (pos: 3 -> pos: 2)
+  // 0000 "16th note" <- remove 
+  // 0000 "4th note" <- pos: 5 -> pos: 3
+  // 0000 "16th note" <- remove
+  // 0000 "8th note" pos: 7 -> pos: 4
+
+  // q=4 -> q=16 would be this... removing ever 2nd, 3rd and 4th note.
+  // 0100 "4th note" pos: 1 -> pos: 1
+  // 0000 "16th note" <- remove
+  // 1000 "8th note" <- remove
+  // 0000 "16th note" <- remove 
+  // 0000 "4th note" <- pos: 5 -> pos: 2
+  
+  // figuring out how much to change the note position is kind of tricky.
+  // for q=16 -> q=8, every second note is removed, and every subsequent note increases
+  // it's position by the length of the new, normalized array + 1.
+
+  if (m1Quan < m2Quan) {
+    const d = highestCommonDenominator(m2Quan, m1Quan)
+    const skip = m2Quan / d
+    const transformMap = new Map<number, number>()
+    let j = 0
+    for (let i = 0; i < m2Quan; i++) {
+      // this note is valid
+      if (i % skip === 0) {
+        transformMap.set(i + 1, j + 1)
+        j++
+      }
     }
-    return {
-      ...x,
-      notePosInMeasure:
-        x.notePosInMeasure + lastNoteOfFirstMeasure.notePosInMeasure,
-    };
-  });
+
+    return containedNotePositionsInMeasure.map(x => {
+      if (x.measureNumber === m1) {
+        return x
+      }
+
+      return {
+        ...x,
+        notePosInMeasure: transformMap.get(x.notePosInMeasure)! + m1Quan
+      }
+    })
+  } else {
+
+    const d = highestCommonDenominator(m2Quan, m1Quan)
+    const skip = m1Quan / d
+
+    const transformMap = new Map<number, number>()
+    let j = 0
+    for (let i = 0; i < m2Quan; i++) {
+      // this note is valid
+      if (i % skip === 0) {
+        transformMap.set(i + 1, j + 1)
+        j++
+      }
+    }
+
+    return containedNotePositionsInMeasure.map(x => {
+      if (x.measureNumber === m1) {
+        return {
+          ...x,
+          notePosInMeasure: transformMap.get(x.notePosInMeasure)!,
+        };
+      }
+
+      return {
+        ...x,
+        notePosInMeasure: x.notePosInMeasure + m1Quan
+      }
+    })
+  }
 }
 
 function allDivisibleBy(notes: ContainedNote[], highestQuantitization: number) {
@@ -370,7 +471,7 @@ export function getPatternQuantitization(
     ) &&
     sequential(data.containedNotePositionsInMeasure)
   ) {
-    return highestQuantitization
+    return highestQuantitization;
   }
 
   // case 2: across measures with same quantitization
@@ -429,18 +530,6 @@ export function getPatternQuantitization(
   // 0001
   // 0000
 
-  // we need to normalize the quantitization to q where q is
-  // the highest quantitization in the pattern (in this case it would
-  // an 8th).
-  // This means in the second measure we remove all the non 4th and 8th notes, eg:
-
-  // 0100 "4th note"
-  // 0000 "16th note" <- remove
-  // 1000 "8th note"
-  // 0000 "16th note" <- remove
-  // 0000 "4th note"
-  // 0000
-
   if (
     measureNums.length === 2 &&
     !allSameQuantitization(data.containedNotePositionsInMeasure)
@@ -450,19 +539,19 @@ export function getPatternQuantitization(
     );
 
     const [m1, m2] = measureNums.sort();
-    const m1q = data.containedNotePositionsInMeasure.find(
-      (x) => x.measureNumber === m1
-    )!.noteQuantitization;
-    const m2q = data.containedNotePositionsInMeasure.find(
-      (x) => x.measureNumber === m2
-    )!.noteQuantitization;
+    const m1q = largestQuantizationInMeasure(
+      m1,
+      data.containedNotePositionsInMeasure
+    );
+    const m2q = largestQuantizationInMeasure(
+      m2,
+      data.containedNotePositionsInMeasure
+    );
 
-    // find m with lowest q
-    // m1 is lower then m2
-    // if (m1q < m2q) {
     const notes = data.containedNotePositionsInMeasure.filter(
       (x) => x.measureNumber === (m1q < m2q ? m1 : m2)
     );
+
     if (allDivisibleBy(notes, highestQuantitization)) {
       const normalized = createVirtualizedMeasure(
         [m1, m2],

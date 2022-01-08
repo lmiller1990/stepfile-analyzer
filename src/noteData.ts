@@ -41,3 +41,13 @@ export const noteData: Map<Quantitization, Quantitization[]> = new Map([
   [64, dup(_64ths, 4)],
   [192, dup(_192ths, 4)],
 ]);
+
+export function highestCommonDenominator (q1: Quantitization, q2: Quantitization) {
+  for (const q of [...quantitization].reverse()) {
+    if (q1 % q === 0 && q2 % q === 0) {
+      return q
+    }
+  }
+
+  throw Error(`${q1} and ${q2} have no common denominator!`)
+}
