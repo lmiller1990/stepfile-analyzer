@@ -16,4 +16,5 @@ export const patterns: PatternBag = {
   "ll-double-tap": [left, left],
   "lll-triple-tap": [left, left, left],
   "llll-quad-tap": [left, left, left, left],
+  "lrlr-drill": [left, right, left, right],
 } as const;

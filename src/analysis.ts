@@ -229,7 +229,7 @@ export function addPatternDataToMeasures(
         ...x,
         notes: x.notes.map<NoteLineWithPatternData>((y) => ({
           ...y,
-          patterns: new Set<string>(),
+          patterns: new Map<string, Quantitization>(),
         })),
       };
     }
@@ -240,7 +240,7 @@ export function addPatternDataToMeasures(
       for (const note of val.containedNotePositionsInMeasure) {
         measuresWithMetadata[note.measureNumber - 1].notes[
           note.notePosInMeasure - 1
-        ].patterns.add(pattern);
+        ].patterns.set(pattern, val.patternQuantitization);
       }
     }
   }
@@ -286,8 +286,8 @@ function getMeasureNumbers(notes: ContainedNote[]) {
   return Array.from(m);
 }
 
-function getHighestQuantitization(notes: ContainedNote[]) {
-  return Math.max(...notes.map((x) => x.noteQuantitization));
+function getHighestQuantitization(notes: ContainedNote[]): Quantitization {
+  return Math.max(...notes.map((x) => x.noteQuantitization)) as Quantitization;
 }
 
 function createVirtualizedMeasure(
@@ -336,7 +336,7 @@ function allDivisibleBy(notes: ContainedNote[], highestQuantitization: number) {
 export function getPatternQuantitization(
   data: PatternData,
   measures: Measure[]
-) {
+): Quantitization {
   // case 1: all notes have the same quantitization and are sequential
   // 0001
   // 0010

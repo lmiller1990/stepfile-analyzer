@@ -23,20 +23,23 @@ export type Direction = "left" | "right" | "up" | "down";
 
 export interface NoteLineWithPatternData extends NoteLine {
   // pattern which this note line is part of
-  // for example Set ("ulr-candle", "ll-tap")
-  patterns: Set<string>
+  // and quantitization ("ulr-candle", "ll-tap")
+  // eg Map<[
+  //   ulr-candle: 4
+  // ]>
+  patterns: Map<string, Quantitization>;
 }
 
 export interface ContainedNote {
   notePosInMeasure: number;
   measureQuantitization: number;
-  noteQuantitization: number;
+  noteQuantitization: Quantitization;
   measureNumber: number;
 }
 
 export interface PatternData {
   noteCheckIndex: number;
-  patternQuantitization: number;
+  patternQuantitization: Quantitization;
   completed: boolean;
 
   // eg in this measure
@@ -46,7 +49,7 @@ export interface PatternData {
   // 0000
   // a three note jackhammer of 4ths would contain note 1, 2, 3.
   // useful for building a nice UI to visualize the patterns.
-  containedNotePositionsInMeasure: ContainedNote[];
+  containedNotePositionsInMeasure: ContainedNote[]
 }
 
 export interface PatternAnalysis {

@@ -1,4 +1,5 @@
-export const quantitization = [4, 8, 12, 16, 24, 32, 48, 64, 192] as const;
+// 0 isn't really valid, it represents either invalid or unset quantitization
+export const quantitization = [0, 4, 8, 12, 16, 24, 32, 48, 64, 192] as const;
 
 export type Quantitization = typeof quantitization[number];
 
