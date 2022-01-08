@@ -36,6 +36,7 @@ export interface ContainedNote {
 
 export interface PatternData {
   noteCheckIndex: number;
+  patternQuantitization: number;
   completed: boolean;
 
   // eg in this measure
@@ -45,7 +46,7 @@ export interface PatternData {
   // 0000
   // a three note jackhammer of 4ths would contain note 1, 2, 3.
   // useful for building a nice UI to visualize the patterns.
-  containedNotePositionsInMeasure: ContainedNote[]
+  containedNotePositionsInMeasure: ContainedNote[];
 }
 
 export interface PatternAnalysis {

@@ -14,7 +14,6 @@ import {
   parse,
 } from "./analysis";
 import { down, right, up, PatternBag, left } from "./patterns";
-import { hasUncaughtExceptionCaptureCallback } from "process";
 
 const data = `0010
 0001
@@ -57,7 +56,7 @@ describe("analyzePatterns", () => {
     0100
     0000
     ,`;
-    const { lines } = parse(data);
+    const { lines, measures } = parse(data);
 
     const patterns: PatternBag = {
       "urd-candle": [up, right, down],
@@ -65,13 +64,184 @@ describe("analyzePatterns", () => {
 
     const analysis = createAnalysisResults(patterns);
 
-    const actual = analyzePatterns(analysis, lines, patterns);
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
 
     expect(actual["urd-candle"].count).toBe(1);
+    expect(actual["urd-candle"].count).toBe(1);
+
+    const pattern = actual["urd-candle"].collection.get("1")!
+
+    expect(pattern.patternQuantitization).toBe(4)
+  });
+
+  it("works across measures with same quantitization", () => {
+    const data = `0000
+    0000
+    0010
+    0001
+    ,
+    0100
+    0000
+    0000
+    0000
+    ,`;
+
+    const { lines, measures } = parse(data);
+
+    const patterns: PatternBag = {
+      "urd-candle": [up, right, down],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+    expect(actual["urd-candle"].count).toBe(1);
+    expect(actual["urd-candle"].count).toBe(1);
+
+    const pattern = actual["urd-candle"].collection.get("3")!
+
+    expect(pattern.patternQuantitization).toBe(4)
+  });
+
+  it("works across measures with different quantitization, m1 > m2", () => {
+    const data = `0000
+    0000
+    0000
+    0000
+    0000
+    0000
+    0010
+    0001
+    ,
+    0100
+    0000
+    0000
+    0000
+    ,`;
+
+    const { lines, measures } = parse(data);
+
+    const patterns: PatternBag = {
+      "urd-candle": [up, right, down],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+    expect(actual["urd-candle"].count).toBe(1);
+    expect(actual["urd-candle"].count).toBe(1);
+
+    const pattern = actual["urd-candle"].collection.get("7")!
+
+    expect(pattern.patternQuantitization).toBe(8)
+  });
+
+  it("works across measures with different quantitization, m1 < m2", () => {
+    const data = `0000
+    0000
+    0010
+    0001
+    ,
+    0100
+    0000
+    0000
+    0000
+    0000
+    0000
+    0000
+    0000
+    ,`;
+
+    const { lines, measures } = parse(data);
+
+    const patterns: PatternBag = {
+      "urd-candle": [up, right, down],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+    expect(actual["urd-candle"].count).toBe(1);
+    expect(actual["urd-candle"].count).toBe(1);
+
+    const pattern = actual["urd-candle"].collection.get("3")!
+
+    expect(pattern.patternQuantitization).toBe(4)
+  });
+
+  it("detects uneven pattern, m1 > m2", () => {
+    const data = `0000
+    0000
+    0000
+    0000
+    0000
+    0000
+    0010
+    0001
+    ,
+    0000
+    0100
+    0000
+    0000
+    ,`;
+
+    const { lines, measures } = parse(data);
+
+    const patterns: PatternBag = {
+      "urd-candle": [up, right, down],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+    expect(actual["urd-candle"].count).toBe(1);
+    expect(actual["urd-candle"].count).toBe(1);
+
+    const pattern = actual["urd-candle"].collection.get("7")!
+
+    expect(pattern.patternQuantitization).toBe(0)
+  });
+
+  it("detects uneven pattern, m1 < m2", () => {
+    const data = `0000
+    0000
+    0000
+    0000
+    0000
+    0000
+    0010
+    0001
+    ,
+    0000
+    0100
+    0000
+    0000
+    ,`;
+
+    const { lines, measures } = parse(data);
+
+    const patterns: PatternBag = {
+      "urd-candle": [up, right, down],
+    };
+
+    const analysis = createAnalysisResults(patterns);
+
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+    expect(actual["urd-candle"].count).toBe(1);
+    expect(actual["urd-candle"].count).toBe(1);
+
+    const pattern = actual["urd-candle"].collection.get("7")!
+
+    expect(pattern.patternQuantitization).toBe(0)
   });
 
   it("double taps", () => {
-    const { lines } = parse(`1000
+    const { lines, measures } = parse(`1000
 1000
 1000
 1000
@@ -82,13 +252,13 @@ describe("analyzePatterns", () => {
     };
 
     const analysis = createAnalysisResults(patterns);
-    const actual = analyzePatterns(analysis, lines, patterns);
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
 
     expect(actual["ll"].count).toBe(3);
   });
 
   it("quantitization", () => {
-    const { lines } = parse(`1000
+    const { lines, measures } = parse(`1000
 0000
 1000
 0000
@@ -105,15 +275,15 @@ describe("analyzePatterns", () => {
     };
 
     const analysis = createAnalysisResults(patterns);
-    const actual = analyzePatterns(analysis, lines, patterns);
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
 
     expect(actual["ll"].count).toBe(5);
     expect(actual["lll"].count).toBe(4);
     expect(actual["llll"].count).toBe(3);
   });
 
-  it("16th candles", () => {
-    const { lines } = parse(`0010
+  it.only("16th candles", () => {
+    const { lines, measures } = parse(`0010
 0001
 0100
 0010
@@ -139,7 +309,7 @@ describe("analyzePatterns", () => {
     };
 
     const analysis = createAnalysisResults(patterns);
-    const actual = analyzePatterns(analysis, lines, patterns);
+    const actual = analyzePatterns(analysis, lines, measures, patterns);
 
     expect(actual).toMatchSnapshot();
   });
@@ -158,7 +328,7 @@ describe("addPatternDataToMeasures", () => {
     };
 
     const analysis = createAnalysisResults(patterns);
-    const data = analyzePatterns(analysis, lines, patterns);
+    const data = analyzePatterns(analysis, lines, measures, patterns);
 
     const actual = addPatternDataToMeasures(measures, data);
     const expected: Measure<NoteLineWithPatternData>[] = [
@@ -220,3 +390,33 @@ describe("getQuantitization", () => {
     expect(lines[7].noteQuantitization).toBe(8)
   });
 });
+
+
+// describe.only("getPatternQuantitization", () => {
+  // it("normalizes uneven quantitizations", () => {
+  //   const chart = `
+  //   0000
+  //   0000
+  //   0000
+  //   0000
+  //   ,
+  //   0000
+  //   0000
+  //   0000
+  //   0000
+  //   0000
+  //   0000
+  //   0000
+  //   0000
+  //   ,`.trim();
+
+  //   const { lines, measures } = parse(data)
+
+  //   const patterns: PatternBag = {
+  //     "lrlrlr-drill": [left, left, left],
+  //   };
+
+  //   const analysis = createAnalysisResults(patterns);
+  //   const data = analyzePatterns(analysis, lines, measures, patterns);
+  // })
+// })
