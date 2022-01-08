@@ -12,6 +12,7 @@ export const patterns: PatternBag = {
   "uld-candle": [up, left, down],
   "dlu-candle": [down, left, up],
   "dru-candle": [down, right, up],
+  "rl-sweep": [left, down, up, right, up, down, left],
   "ll-double-tap": [left, left],
   "lll-triple-tap": [left, left, left],
   "llll-quad-tap": [left, left, left, left],

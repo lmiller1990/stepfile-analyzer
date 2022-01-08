@@ -14,6 +14,7 @@ import {
   parse,
 } from "./analysis";
 import { down, right, up, PatternBag, left } from "./patterns";
+import { hasUncaughtExceptionCaptureCallback } from "process";
 
 const data = `0010
 0001
@@ -32,102 +33,10 @@ const data = `0010
 
 describe("parse", () => {
   it("works", () => {
-    let id = 4;
-    let pos = 0;
-    const empty = (measure: number): NoteLine => {
-      id++;
-      pos++;
-
-      return {
-        notePosInMeasure: pos,
-        id: id.toString(),
-        left: false,
-        down: false,
-        quantitization: 8,
-        raw: "0000",
-        up: false,
-        right: false,
-        measure,
-      };
-    };
-
-    const m1: NoteLine[] = [
-      {
-        id: "1",
-        notePosInMeasure: 1,
-        left: false,
-        down: false,
-        up: true,
-        raw: "0010",
-        right: false,
-        measure: 1,
-        quantitization: 4,
-      },
-      {
-        id: "2",
-        notePosInMeasure: 2,
-        left: false,
-        down: false,
-        raw: "0001",
-        up: false,
-        right: true,
-        measure: 1,
-        quantitization: 4,
-      },
-      {
-        id: "3",
-        notePosInMeasure: 3,
-        left: false,
-        down: true,
-        up: false,
-        raw: "0100",
-        right: false,
-        measure: 1,
-        quantitization: 4,
-      },
-      {
-        id: "4",
-        notePosInMeasure: 4,
-        raw: "0000",
-        left: false,
-        down: false,
-        up: false,
-        right: false,
-        measure: 1,
-        quantitization: 4,
-      },
-    ];
-
-    const m2: NoteLine[] = [
-      empty(2),
-      empty(2),
-      empty(2),
-      empty(2),
-      empty(2),
-      empty(2),
-      empty(2),
-      empty(2),
-    ];
-
-    const expected: NoteLine[] = [...m1, ...m2];
-
     const actual = parse(data);
 
-    expect(actual.lines).toEqual(expected);
-    expect(actual.measures).toEqual([
-      {
-        notes: m1,
-        number: 1,
-        quantitization: 4,
-      },
-      {
-        notes: m2,
-        number: 2,
-        quantitization: 8,
-      },
-    ]);
-
-    expect(actual).toMatchSnapshot();
+    expect(actual.lines).toMatchSnapshot()
+    expect(actual.measures).toMatchSnapshot()
   });
 });
 
@@ -203,37 +112,6 @@ describe("analyzePatterns", () => {
     expect(actual["llll"].count).toBe(3);
   });
 
-  it.skip("adds quantitization to pattern", () => {
-    const { lines } = parse(`1000
-0000
-1000
-0000
-,`);
-
-    const patterns: PatternBag = {
-      ll: [left, left],
-    };
-
-    const analysis = createAnalysisResults(patterns);
-    const actual = analyzePatterns(analysis, lines, patterns);
-
-    const identifiedPattern = actual["ll"].collection.get("1")!;
-
-    expect(actual["ll"].count).toBe(1);
-    expect(identifiedPattern.containedNotePositionsInMeasure).toEqual([
-      {
-        notePosInMeasure: 1,
-        measureQuantitization: 4,
-        measureNumber: 1,
-      },
-      {
-        notePosInMeasure: 3,
-        measureQuantitization: 4,
-        measureNumber: 1,
-      },
-    ]);
-  });
-
   it("16th candles", () => {
     const { lines } = parse(`0010
 0001
@@ -267,7 +145,7 @@ describe("analyzePatterns", () => {
   });
 });
 
-describe.only("addPatternDataToMeasures", () => {
+describe("addPatternDataToMeasures", () => {
   it("adds pattern metadata to notes in measures", () => {
     const { lines, measures } = parse(`0000
 0010
@@ -297,5 +175,48 @@ describe.only("addPatternDataToMeasures", () => {
     ];
 
     expect(actual).toEqual(expected);
+  });
+});
+
+describe("getQuantitization", () => {
+  it("4ths", () => {
+    const { lines } = parse(`0000
+0010
+1000
+0100
+,`);
+
+    expect(lines[0].measureQuantitization).toBe(4)
+    expect(lines[0].noteQuantitization).toBe(4)
+    expect(lines[1].measureQuantitization).toBe(4)
+    expect(lines[1].noteQuantitization).toBe(4)
+    expect(lines[2].measureQuantitization).toBe(4)
+    expect(lines[2].noteQuantitization).toBe(4)
+    expect(lines[3].measureQuantitization).toBe(4)
+    expect(lines[3].noteQuantitization).toBe(4)
+  });
+
+  it("8ths", () => {
+    const { lines } = parse(`0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+,`);
+
+    expect(lines[0].noteQuantitization).toBe(4)
+    expect(lines[1].noteQuantitization).toBe(8)
+
+    expect(lines[2].noteQuantitization).toBe(4)
+    expect(lines[3].noteQuantitization).toBe(8)
+
+    expect(lines[4].noteQuantitization).toBe(4)
+    expect(lines[5].noteQuantitization).toBe(8)
+
+    expect(lines[6].noteQuantitization).toBe(4)
+    expect(lines[7].noteQuantitization).toBe(8)
   });
 });

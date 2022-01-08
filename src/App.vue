@@ -91,7 +91,10 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'left')"
       >
-        <Arrow direction="left" />
+        <Arrow
+          direction="left"
+          :quantitization="measure.notes[line - 1].noteQuantitization"
+        />
       </div>
 
       <div
@@ -99,7 +102,10 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'down')"
       >
-        <Arrow direction="down" />
+        <Arrow
+          direction="down"
+          :quantitization="measure.notes[line - 1].noteQuantitization"
+        />
       </div>
 
       <div
@@ -107,7 +113,10 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'up')"
       >
-        <Arrow direction="up" />
+        <Arrow
+          direction="up"
+          :quantitization="measure.notes[line - 1].noteQuantitization"
+        />
       </div>
 
       <div
@@ -115,7 +124,10 @@ const style = (note: NoteLineWithPatternData, direction: Direction) => {
         class="note"
         :style="style(measure.notes[line - 1], 'right')"
       >
-        <Arrow direction="right" />
+        <Arrow
+          direction="right"
+          :quantitization="measure.notes[line - 1].noteQuantitization"
+        />
       </div>
     </div>
   </div>

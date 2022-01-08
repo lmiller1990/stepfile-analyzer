@@ -1,3 +1,5 @@
+import { Quantitization } from "./noteData";
+
 export interface NoteLine {
   id: string;
   notePosInMeasure: number;
@@ -7,7 +9,8 @@ export interface NoteLine {
   down: boolean;
   right: boolean;
   measure: number;
-  quantitization: number; // 4th, 8th etc.
+  measureQuantitization: Quantitization;
+  noteQuantitization: Quantitization; // 4th, 8th etc.
 }
 
 export interface Measure<T = NoteLine> {
@@ -27,6 +30,7 @@ export interface NoteLineWithPatternData extends NoteLine {
 export interface ContainedNote {
   notePosInMeasure: number;
   measureQuantitization: number;
+  noteQuantitization: number;
   measureNumber: number;
 }
 

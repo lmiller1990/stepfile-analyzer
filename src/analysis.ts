@@ -1,6 +1,7 @@
+import { QuantitizationError } from "./errors";
+import { noteData, Quantitization, quantitization } from "./noteData";
 import type { PatternBag } from "./patterns";
 import type {
-  ContainedNote,
   Measure,
   NoteLine,
   NoteLineWithPatternData,
@@ -8,15 +9,19 @@ import type {
   PatternData,
 } from "./types";
 
-function getQuantitization(data: string[]) {
-  let count = 0;
+function getQuantitization(data: string[]): Quantitization {
+  let count: number = 0;
   for (const line of data) {
     if (line.startsWith(",")) {
-      return count;
+      if (!quantitization.includes(count as Quantitization)) {
+        throw new QuantitizationError(count, data);
+      }
+      return count as Quantitization;
     }
     count++;
   }
-  return count;
+
+  throw new QuantitizationError(count, data);
 }
 
 export function parse(data: string): {
@@ -24,11 +29,11 @@ export function parse(data: string): {
   measures: Measure[];
 } {
   const notes: NoteLine[] = [];
-  const lines = data.split("\n");
+  const lines = data.split("\n").filter(x => x.length > 0).map(x => x.trim());
   const measures: Measure[] = [];
 
   let measure = 1;
-  let measureQuantitization: number = 0;
+  let measureQuantitization: Quantitization | undefined = undefined
   let newMeasure = true;
   let notePosInMeasure = 1;
   let id = 1;
@@ -39,8 +44,8 @@ export function parse(data: string): {
     quantitization: 0,
   };
 
-  for (const d in lines) {
-    const datum = lines[d].trim();
+  for (let i = 0; i < lines.length; i++) {
+    const datum = lines[i].trim();
 
     if (datum.startsWith(",")) {
       measures.push(currentMeasure);
@@ -51,13 +56,25 @@ export function parse(data: string): {
     }
 
     if (newMeasure) {
-      measureQuantitization = getQuantitization(lines.slice(parseInt(d, 10)));
+      const thisMeasure = lines.slice(i).filter(x => x.length > 0)
+      measureQuantitization = getQuantitization(thisMeasure);
+
       newMeasure = false;
       currentMeasure = {
         quantitization: measureQuantitization,
         number: measure,
         notes: [],
       };
+    }
+
+    if (!measureQuantitization) {
+      throw Error(`Meaure quantitization cannot be null!`)
+    }
+
+    const q = noteData.get(measureQuantitization)![notePosInMeasure - 1]
+
+    if (!q) {
+      throw new QuantitizationError(notePosInMeasure - 1, currentMeasure)
     }
 
     const line: NoteLine = {
@@ -68,7 +85,8 @@ export function parse(data: string): {
       down: datum[1] === "1",
       up: datum[2] === "1",
       right: datum[3] === "1",
-      quantitization: measureQuantitization,
+      noteQuantitization: q,
+      measureQuantitization: measureQuantitization,
       measure,
     };
 
@@ -122,7 +140,8 @@ export function analyzePatterns(
             containedNotePositionsInMeasure:
               found.containedNotePositionsInMeasure.concat({
                 notePosInMeasure: note.notePosInMeasure,
-                measureQuantitization: note.quantitization,
+                measureQuantitization: note.measureQuantitization,
+                noteQuantitization: note.noteQuantitization,
                 measureNumber: note.measure,
               }),
           };
@@ -158,7 +177,8 @@ export function analyzePatterns(
           containedNotePositionsInMeasure: [
             {
               notePosInMeasure: note.notePosInMeasure,
-              measureQuantitization: note.quantitization,
+              measureQuantitization: note.measureQuantitization,
+              noteQuantitization: note.noteQuantitization,
               measureNumber: note.measure,
             },
           ],

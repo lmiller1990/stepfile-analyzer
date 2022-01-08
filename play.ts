@@ -12,13 +12,17 @@ const data = fs.readFileSync(
   "utf-8"
 );
 
-const parsed = parse(data);
-const values = createAnalysisResults(patterns);
-const analysis = analyzePatterns(values, parsed.lines, patterns);
+const sweep = patterns['rl-sweep']
+const myPatterns = { 'rl-sweep': sweep }
 
-for (const pattern of Object.keys(patterns)) {
+const parsed = parse(data);
+const values = createAnalysisResults(myPatterns);
+const analysis = analyzePatterns(values, parsed.lines, myPatterns);
+
+for (const pattern of Object.keys(myPatterns)) {
   const data = analysis[pattern].collection;
   console.log(`\nPattern: ${pattern}`);
+  console.log(data.get('14'))
 
   if (data.size === 0) {
     console.log("None found.");
