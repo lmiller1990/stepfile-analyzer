@@ -29,11 +29,14 @@ export function parse(data: string): {
   measures: Measure[];
 } {
   const notes: NoteLine[] = [];
-  const lines = data.split("\n").filter(x => x.length > 0).map(x => x.trim());
+  const lines = data
+    .split("\n")
+    .filter((x) => x.length > 0)
+    .map((x) => x.trim());
   const measures: Measure[] = [];
 
   let measure = 1;
-  let measureQuantitization: Quantitization | undefined = undefined
+  let measureQuantitization: Quantitization | undefined = undefined;
   let newMeasure = true;
   let notePosInMeasure = 1;
   let id = 1;
@@ -56,7 +59,7 @@ export function parse(data: string): {
     }
 
     if (newMeasure) {
-      const thisMeasure = lines.slice(i).filter(x => x.length > 0)
+      const thisMeasure = lines.slice(i).filter((x) => x.length > 0);
       measureQuantitization = getQuantitization(thisMeasure);
 
       newMeasure = false;
@@ -68,13 +71,13 @@ export function parse(data: string): {
     }
 
     if (!measureQuantitization) {
-      throw Error(`Meaure quantitization cannot be null!`)
+      throw Error(`Meaure quantitization cannot be null!`);
     }
 
-    const q = noteData.get(measureQuantitization)![notePosInMeasure - 1]
+    const q = noteData.get(measureQuantitization)![notePosInMeasure - 1];
 
     if (!q) {
-      throw new QuantitizationError(notePosInMeasure - 1, currentMeasure)
+      throw new QuantitizationError(notePosInMeasure - 1, currentMeasure);
     }
 
     const line: NoteLine = {
