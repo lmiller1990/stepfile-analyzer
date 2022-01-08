@@ -1,4 +1,4 @@
-import { Quantitization } from "./noteData";
+import { Quantization } from "./noteData";
 
 export interface NoteLine {
   id: string;
@@ -9,13 +9,13 @@ export interface NoteLine {
   down: boolean;
   right: boolean;
   measure: number;
-  measureQuantitization: Quantitization;
-  noteQuantitization: Quantitization; // 4th, 8th etc.
+  measureQuantization: Quantization;
+  noteQuantization: Quantization; // 4th, 8th etc.
 }
 
 export interface Measure<T = NoteLine> {
   number: number
-  quantitization: number
+  quantization: number
   notes: T[]
 }
 
@@ -23,23 +23,23 @@ export type Direction = "left" | "right" | "up" | "down";
 
 export interface NoteLineWithPatternData extends NoteLine {
   // pattern which this note line is part of
-  // and quantitization ("ulr-candle", "ll-tap")
+  // and quantization ("ulr-candle", "ll-tap")
   // eg Map<[
   //   ulr-candle: 4
   // ]>
-  patterns: Map<string, Quantitization>;
+  patterns: Map<string, Quantization>;
 }
 
 export interface ContainedNote {
   notePosInMeasure: number;
-  measureQuantitization: Quantitization;
-  noteQuantitization: Quantitization;
+  measureQuantization: Quantization;
+  noteQuantization: Quantization;
   measureNumber: number;
 }
 
 export interface PatternData {
   noteCheckIndex: number;
-  patternQuantitization: Quantitization;
+  patternQuantization: Quantization;
   completed: boolean;
 
   // eg in this measure

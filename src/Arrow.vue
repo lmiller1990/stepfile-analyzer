@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import type { Quantitization } from "./noteData";
+import type { Quantization } from "./noteData";
 import type { Direction } from "./types";
 
 const props = defineProps<{
   direction: Direction;
-  quantitization: Quantitization;
+  quantization: Quantization;
 }>();
 
 let rotation: `${0 | 90 | 180 | 270}deg` = "0deg";
 
-const colors: Map<Quantitization, string> = new Map([
+const colors: Map<Quantization, string> = new Map([
   [4, "red"],
   [8, "blue"],
   [12, "lime"],
@@ -40,8 +40,8 @@ const style = {
   transform: `rotate(${rotation})`,
 };
 
-console.log(props.quantitization)
-const fill = colors.get(props.quantitization)
+console.log(props.quantization)
+const fill = colors.get(props.quantization)
 </script>
 
 <template>

@@ -1,7 +1,7 @@
-// 0 isn't really valid, it represents either invalid or unset quantitization
-export const quantitization = [0, 4, 8, 12, 16, 24, 32, 48, 64, 192] as const;
+// 0 isn't really valid, it represents either invalid or unset quantization
+export const quantization = [0, 4, 8, 12, 16, 24, 32, 48, 64, 192] as const;
 
-export type Quantitization = typeof quantitization[number];
+export type Quantization = typeof quantization[number];
 
 const dup = <T>(src: T[], n: number) => {
   const res: Array<T> = [];
@@ -11,18 +11,18 @@ const dup = <T>(src: T[], n: number) => {
   return res;
 };
 
-const _4ths: Quantitization[] = [4, 4, 4, 4];
-const _8ths: Quantitization[] = [4, 8];
-const _12ths: Quantitization[] = [4, 12, 8];
-const _16ths: Quantitization[] = [4, 16, 8, 16];
-const _24ths: Quantitization[] = [4, 24, 12, 8, 12, 24];
-const _32ths: Quantitization[] = [4, 32, 16, 32, 8, 32, 16, 32];
-const _48ths: Quantitization[] = [4, 48, 24, 16, 12, 48, 8, 48, 12, 16, 24, 48];
-const _64ths: Quantitization[] = [
+const _4ths: Quantization[] = [4, 4, 4, 4];
+const _8ths: Quantization[] = [4, 8];
+const _12ths: Quantization[] = [4, 12, 8];
+const _16ths: Quantization[] = [4, 16, 8, 16];
+const _24ths: Quantization[] = [4, 24, 12, 8, 12, 24];
+const _32ths: Quantization[] = [4, 32, 16, 32, 8, 32, 16, 32];
+const _48ths: Quantization[] = [4, 48, 24, 16, 12, 48, 8, 48, 12, 16, 24, 48];
+const _64ths: Quantization[] = [
   4, 64, 32, 64, 16, 64, 32, 64, 8, 64, 32, 64, 16, 64, 32, 64,
 ];
 
-const _192ths: Quantitization[] = [
+const _192ths: Quantization[] = [
   4, 192, 192, 192 /* end */, 64, 192, 32, 192 /* end */, 48, 192, 192,
   192 /* end */, 16, 192, 192, 192 /* end */, 12, 192, 32, 192 /* end */, 64,
   192, 192, 192 /* end */, 8, 192, 192, 192 /* end */, 64, 192, 32,
@@ -30,7 +30,7 @@ const _192ths: Quantitization[] = [
   192, 32, 192 /* end */, 64, 192, 192, 192 /* end */,
 ];
 
-export const noteData: Map<Quantitization, Quantitization[]> = new Map([
+export const noteData: Map<Quantization, Quantization[]> = new Map([
   [4, _4ths],
   [8, dup(_8ths, 4)],
   [12, dup(_12ths, 4)],
@@ -42,8 +42,8 @@ export const noteData: Map<Quantitization, Quantitization[]> = new Map([
   [192, dup(_192ths, 4)],
 ]);
 
-export function highestCommonDenominator (q1: Quantitization, q2: Quantitization) {
-  for (const q of [...quantitization].reverse()) {
+export function highestCommonDenominator (q1: Quantization, q2: Quantization) {
+  for (const q of [...quantization].reverse()) {
     if (q1 % q === 0 && q2 % q === 0) {
       return q
     }

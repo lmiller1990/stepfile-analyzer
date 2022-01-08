@@ -1,5 +1,5 @@
-import { QuantitizationError } from "./errors";
-import { noteData, Quantitization, quantitization, highestCommonDenominator } from "./noteData";
+import { QuantizationError } from "./errors";
+import { noteData, Quantization, quantization, highestCommonDenominator } from "./noteData";
 import type { PatternBag } from "./patterns";
 import type {
   ContainedNote,
@@ -10,19 +10,19 @@ import type {
   PatternData,
 } from "./types";
 
-function getQuantitization(data: string[]): Quantitization {
+function getQuantization(data: string[]): Quantization {
   let count: number = 0;
   for (const line of data) {
     if (line.startsWith(",")) {
-      if (!quantitization.includes(count as Quantitization)) {
-        throw new QuantitizationError(count, data);
+      if (!quantization.includes(count as Quantization)) {
+        throw new QuantizationError(count, data);
       }
-      return count as Quantitization;
+      return count as Quantization;
     }
     count++;
   }
 
-  throw new QuantitizationError(count, data);
+  throw new QuantizationError(count, data);
 }
 
 export function parse(data: string): {
@@ -37,7 +37,7 @@ export function parse(data: string): {
   const measures: Measure[] = [];
 
   let measure = 1;
-  let measureQuantitization: Quantitization | undefined = undefined;
+  let measureQuantization: Quantization | undefined = undefined;
   let newMeasure = true;
   let notePosInMeasure = 1;
   let id = 1;
@@ -45,7 +45,7 @@ export function parse(data: string): {
   let currentMeasure: Measure = {
     number: measure,
     notes: [],
-    quantitization: 0,
+    quantization: 0,
   };
 
   for (let i = 0; i < lines.length; i++) {
@@ -61,24 +61,24 @@ export function parse(data: string): {
 
     if (newMeasure) {
       const thisMeasure = lines.slice(i).filter((x) => x.length > 0);
-      measureQuantitization = getQuantitization(thisMeasure);
+      measureQuantization = getQuantization(thisMeasure);
 
       newMeasure = false;
       currentMeasure = {
-        quantitization: measureQuantitization,
+        quantization: measureQuantization,
         number: measure,
         notes: [],
       };
     }
 
-    if (!measureQuantitization) {
-      throw Error(`Meaure quantitization cannot be null!`);
+    if (!measureQuantization) {
+      throw Error(`Meaure quantization cannot be null!`);
     }
 
-    const q = noteData.get(measureQuantitization)![notePosInMeasure - 1];
+    const q = noteData.get(measureQuantization)![notePosInMeasure - 1];
 
     if (!q) {
-      throw new QuantitizationError(notePosInMeasure - 1, currentMeasure);
+      throw new QuantizationError(notePosInMeasure - 1, currentMeasure);
     }
 
     const line: NoteLine = {
@@ -89,8 +89,8 @@ export function parse(data: string): {
       down: datum[1] === "1",
       up: datum[2] === "1",
       right: datum[3] === "1",
-      noteQuantitization: q,
-      measureQuantitization: measureQuantitization,
+      noteQuantization: q,
+      measureQuantization: measureQuantization,
       measure,
     };
 
@@ -145,8 +145,8 @@ export function analyzePatterns(
             containedNotePositionsInMeasure:
               found.containedNotePositionsInMeasure.concat({
                 notePosInMeasure: note.notePosInMeasure,
-                measureQuantitization: note.measureQuantitization,
-                noteQuantitization: note.noteQuantitization,
+                measureQuantization: note.measureQuantization,
+                noteQuantization: note.noteQuantization,
                 measureNumber: note.measure,
               }),
           };
@@ -158,7 +158,7 @@ export function analyzePatterns(
             const data = values[key].collection.get(k)!;
             values[key].collection.set(k, {
               ...data,
-              patternQuantitization: getPatternQuantitization(data, measures),
+              patternQuantization: getPatternQuantization(data, measures),
               completed: true,
             });
             values[key].count++;
@@ -181,12 +181,12 @@ export function analyzePatterns(
         values[key].collection.set(note.id, {
           noteCheckIndex: 1,
           completed: false,
-          patternQuantitization: 0,
+          patternQuantization: 0,
           containedNotePositionsInMeasure: [
             {
               notePosInMeasure: note.notePosInMeasure,
-              measureQuantitization: note.measureQuantitization,
-              noteQuantitization: note.noteQuantitization,
+              measureQuantization: note.measureQuantization,
+              noteQuantization: note.noteQuantization,
               measureNumber: note.measure,
             },
           ],
@@ -229,7 +229,7 @@ export function addPatternDataToMeasures(
         ...x,
         notes: x.notes.map<NoteLineWithPatternData>((y) => ({
           ...y,
-          patterns: new Map<string, Quantitization>(),
+          patterns: new Map<string, Quantization>(),
         })),
       };
     }
@@ -240,7 +240,7 @@ export function addPatternDataToMeasures(
       for (const note of val.containedNotePositionsInMeasure) {
         measuresWithMetadata[note.measureNumber - 1].notes[
           note.notePosInMeasure - 1
-        ].patterns.set(pattern, val.patternQuantitization);
+        ].patterns.set(pattern, val.patternQuantization);
       }
     }
   }
@@ -259,9 +259,9 @@ function sequential(notes: ContainedNote[]) {
   return true;
 }
 
-function allSameQuantitization(notes: ContainedNote[]) {
+function allSameQuantization(notes: ContainedNote[]) {
   return notes.every(
-    (x) => x.noteQuantitization === notes[0].noteQuantitization
+    (x) => x.noteQuantization === notes[0].noteQuantization
   );
 }
 
@@ -286,14 +286,14 @@ function getMeasureNumbers(notes: ContainedNote[]) {
   return Array.from(m);
 }
 
-function getHighestQuantitization(notes: ContainedNote[]): Quantitization {
-  return Math.max(...notes.map((x) => x.noteQuantitization)) as Quantitization;
+function getHighestQuantization(notes: ContainedNote[]): Quantization {
+  return Math.max(...notes.map((x) => x.noteQuantization)) as Quantization;
 }
 
 function largestQuantizationInMeasure(measure: number, notes: ContainedNote[]) {
   return notes.reduce((acc, curr) => {
-    if (curr.measureNumber === measure && curr.noteQuantitization > acc) {
-      return curr.noteQuantitization;
+    if (curr.measureNumber === measure && curr.noteQuantization > acc) {
+      return curr.noteQuantization;
     }
     return acc;
   }, 0);
@@ -333,8 +333,8 @@ export function createVirtualizedMeasure(
   // 0000
   // 0000
   // then we just see if they are sequential like in case 1
-  const m1Quan = m1Notes[0].measureQuantitization 
-  const m2Quan = m2Notes[0].measureQuantitization
+  const m1Quan = m1Notes[0].measureQuantization 
+  const m2Quan = m2Notes[0].measureQuantization
 
   if (m1Quan === m2Quan) {
     return containedNotePositionsInMeasure.map((x) => {
@@ -350,8 +350,8 @@ export function createVirtualizedMeasure(
   }
 
   // Case: m1 quantization (8) less than m2 quantization (16)
-  // We need to normalize the quantitization to q where q is
-  // the highest quantitization in the pattern (in this case it would
+  // We need to normalize the quantization to q where q is
+  // the highest quantization in the pattern (in this case it would
   // an 8th).
   // This means in the second measure we remove all the non 4th and 8th notes,
   // and adjust the note position.
@@ -430,27 +430,27 @@ export function createVirtualizedMeasure(
   }
 }
 
-function allDivisibleBy(notes: ContainedNote[], highestQuantitization: number) {
-  return notes.every((x) => highestQuantitization % x.noteQuantitization === 0);
+function allDivisibleBy(notes: ContainedNote[], highestQuantization: number) {
+  return notes.every((x) => highestQuantization % x.noteQuantization === 0);
 }
 
-export function getPatternQuantitization(
+export function getPatternQuantization(
   data: PatternData,
   measures: Measure[]
-): Quantitization {
-  // case 1: all notes have the same quantitization and are sequential
+): Quantization {
+  // case 1: all notes have the same quantization and are sequential
   // 0001
   // 0010
   // 0100
 
   if (
-    allSameQuantitization(data.containedNotePositionsInMeasure) &&
+    allSameQuantization(data.containedNotePositionsInMeasure) &&
     sequential(data.containedNotePositionsInMeasure)
   ) {
-    return data.containedNotePositionsInMeasure[0].noteQuantitization;
+    return data.containedNotePositionsInMeasure[0].noteQuantization;
   }
 
-  // case: different quantitization in a single measure, by all corectly divisible
+  // case: different quantization in a single measure, by all corectly divisible
   // eg
   // 0001 -> 4th
   // 0010 -> 8th
@@ -461,20 +461,20 @@ export function getPatternQuantitization(
   // 0000
   // 0000
 
-  const highestQuantitization = getHighestQuantitization(
+  const highestQuantization = getHighestQuantization(
     data.containedNotePositionsInMeasure
   );
   if (
     allDivisibleBy(
       data.containedNotePositionsInMeasure,
-      highestQuantitization
+      highestQuantization
     ) &&
     sequential(data.containedNotePositionsInMeasure)
   ) {
-    return highestQuantitization;
+    return highestQuantization;
   }
 
-  // case 2: across measures with same quantitization
+  // case 2: across measures with same quantization
   // 0000
   // 0001
   // 0010
@@ -488,7 +488,7 @@ export function getPatternQuantitization(
 
   if (
     measureNums.length === 2 &&
-    allSameQuantitization(data.containedNotePositionsInMeasure)
+    allSameQuantization(data.containedNotePositionsInMeasure)
   ) {
     const normalizedContainedNotes = createVirtualizedMeasure(
       measureNums as [number, number],
@@ -496,11 +496,11 @@ export function getPatternQuantitization(
     );
 
     if (sequential(normalizedContainedNotes)) {
-      return data.containedNotePositionsInMeasure[0].noteQuantitization;
+      return data.containedNotePositionsInMeasure[0].noteQuantization;
     }
   }
 
-  // case 3: across measures with different quantitization
+  // case 3: across measures with different quantization
   // in this example the first measure q=8, second q=16
   // an 8th note "sweep" continues from m1 to m2.
   //
@@ -532,9 +532,9 @@ export function getPatternQuantitization(
 
   if (
     measureNums.length === 2 &&
-    !allSameQuantitization(data.containedNotePositionsInMeasure)
+    !allSameQuantization(data.containedNotePositionsInMeasure)
   ) {
-    const highestQuantitization = getHighestQuantitization(
+    const highestQuantization = getHighestQuantization(
       data.containedNotePositionsInMeasure
     );
 
@@ -552,7 +552,7 @@ export function getPatternQuantitization(
       (x) => x.measureNumber === (m1q < m2q ? m1 : m2)
     );
 
-    if (allDivisibleBy(notes, highestQuantitization)) {
+    if (allDivisibleBy(notes, highestQuantization)) {
       const normalized = createVirtualizedMeasure(
         [m1, m2],
         data.containedNotePositionsInMeasure
@@ -560,7 +560,7 @@ export function getPatternQuantitization(
 
       // and sequential?
       if (sequential(normalized)) {
-        return highestQuantitization;
+        return highestQuantization;
       }
     }
   }

@@ -8,7 +8,7 @@ import {
 } from "./analysis";
 import { patterns } from "./patterns";
 import type { Direction, Measure, NoteLineWithPatternData } from "./types";
-import { quantitization } from "./noteData";
+import { quantization } from "./noteData";
 import { chart } from "./chart";
 import Arrow from "./Arrow.vue";
 
@@ -21,15 +21,15 @@ const analysis = analyzePatterns(
 );
 const measures = addPatternDataToMeasures(data.measures, analysis);
 
-const quantitizations = quantitization.map((x) => ({
+const quantizations = quantization.map((x) => ({
   id: `q-${x}`,
-  quantitization: x,
+  quantization: x,
   name: x === 32 || 192 ? `${x}nd` : `${x}th`,
 }));
 
 const selectedPattern = ref<string>("urd-candle");
-const selectedQuantitization = ref<typeof quantitizations[number]>(
-  quantitizations[0]
+const selectedQuantization = ref<typeof quantizations[number]>(
+  quantizations[0]
 );
 
 const positions = new Map<Direction, number>([
@@ -55,22 +55,22 @@ const measureStyle = (
   measure: Measure<NoteLineWithPatternData>
 ): HTMLAttributes["style"] => {
   const line = measure.notes[lineNumber - 1];
-  const desiredPatternQuantitization = line.patterns.get(
+  const desiredPatternQuantization = line.patterns.get(
     selectedPattern.value
   )!;
   const highlight =
-    desiredPatternQuantitization ===
-    selectedQuantitization.value.quantitization;
+    desiredPatternQuantization ===
+    selectedQuantization.value.quantization;
 
   return {
-    top: `${(measureHeight / measure.quantitization) * (lineNumber - 1)}px`,
+    top: `${(measureHeight / measure.quantization) * (lineNumber - 1)}px`,
     background: highlight ? "rgba(172, 215, 230, 0.50)" : "none",
-    height: `${measureHeight / measure.quantitization}px`,
+    height: `${measureHeight / measure.quantization}px`,
   };
 };
 
-function setQuantitization(q: typeof quantitizations[number]) {
-  selectedQuantitization.value = q;
+function setQuantization(q: typeof quantizations[number]) {
+  selectedQuantization.value = q;
 }
 </script>
 
@@ -84,7 +84,7 @@ function setQuantitization(q: typeof quantitizations[number]) {
       :style="{ height: `${measureHeight}px`, width: `${measureWidth}px` }"
     >
       <div
-        v-for="line of measure.quantitization"
+        v-for="line of measure.quantization"
         class="line"
         :key="line"
         :style="measureStyle(line, measure)"
@@ -96,7 +96,7 @@ function setQuantitization(q: typeof quantitizations[number]) {
         >
           <Arrow
             direction="left"
-            :quantitization="measure.notes[line - 1].noteQuantitization"
+            :quantization="measure.notes[line - 1].noteQuantization"
           />
         </div>
 
@@ -107,7 +107,7 @@ function setQuantitization(q: typeof quantitizations[number]) {
         >
           <Arrow
             direction="down"
-            :quantitization="measure.notes[line - 1].noteQuantitization"
+            :quantization="measure.notes[line - 1].noteQuantization"
           />
         </div>
 
@@ -118,7 +118,7 @@ function setQuantitization(q: typeof quantitizations[number]) {
         >
           <Arrow
             direction="up"
-            :quantitization="measure.notes[line - 1].noteQuantitization"
+            :quantization="measure.notes[line - 1].noteQuantization"
           />
         </div>
 
@@ -129,7 +129,7 @@ function setQuantitization(q: typeof quantitizations[number]) {
         >
           <Arrow
             direction="right"
-            :quantitization="measure.notes[line - 1].noteQuantitization"
+            :quantization="measure.notes[line - 1].noteQuantization"
           />
         </div>
       </div>
@@ -152,14 +152,14 @@ function setQuantitization(q: typeof quantitizations[number]) {
     </div>
 
     <div>
-      <h1>Quantitization</h1>
-      <div v-for="q of quantitizations" :key="q.id">
+      <h1>Quantization</h1>
+      <div v-for="q of quantizations" :key="q.id">
         <input
           type="radio"
           :id="q.id"
           :value="q.id"
-          :checked="q.id === selectedQuantitization.id"
-          @input="setQuantitization(q)"
+          :checked="q.id === selectedQuantization.id"
+          @input="setQuantization(q)"
         />
         <label :for="q.id">{{ q.name }}</label>
       </div>
