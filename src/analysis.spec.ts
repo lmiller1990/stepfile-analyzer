@@ -282,7 +282,7 @@ describe("analyzePatterns", () => {
     expect(actual["llll"].count).toBe(3);
   });
 
-  it.only("16th candles", () => {
+  it("16th candles", () => {
     const { lines, measures } = parse(`0010
 0001
 0100
@@ -334,10 +334,10 @@ describe("addPatternDataToMeasures", () => {
     const expected: Measure<NoteLineWithPatternData>[] = [
       {
         notes: [
-          { ...lines[0], patterns: new Set() },
-          { ...lines[1], patterns: new Set(["uld-candle"]) },
-          { ...lines[2], patterns: new Set(["uld-candle"]) },
-          { ...lines[3], patterns: new Set(["uld-candle"]) },
+          { ...lines[0], patterns: new Map() },
+          { ...lines[1], patterns: new Map([["uld-candle", 4]]) },
+          { ...lines[2], patterns: new Map([["uld-candle", 4]]) },
+          { ...lines[3], patterns: new Map([["uld-candle", 4]]) },
         ],
         quantitization: 4,
         number: 1,
@@ -390,33 +390,3 @@ describe("getQuantitization", () => {
     expect(lines[7].noteQuantitization).toBe(8)
   });
 });
-
-
-// describe.only("getPatternQuantitization", () => {
-  // it("normalizes uneven quantitizations", () => {
-  //   const chart = `
-  //   0000
-  //   0000
-  //   0000
-  //   0000
-  //   ,
-  //   0000
-  //   0000
-  //   0000
-  //   0000
-  //   0000
-  //   0000
-  //   0000
-  //   0000
-  //   ,`.trim();
-
-  //   const { lines, measures } = parse(data)
-
-  //   const patterns: PatternBag = {
-  //     "lrlrlr-drill": [left, left, left],
-  //   };
-
-  //   const analysis = createAnalysisResults(patterns);
-  //   const data = analyzePatterns(analysis, lines, measures, patterns);
-  // })
-// })

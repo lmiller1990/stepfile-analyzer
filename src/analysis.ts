@@ -476,7 +476,5 @@ export function getPatternQuantitization(
     }
   }
 
-  console.log("EEEE");
-
   return 0;
 }
