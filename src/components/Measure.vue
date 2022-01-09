@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { Direction, Measure, NoteLineWithPatternData } from "./types";
+import type { Measure, NoteLineWithPatternData } from "../types";
 import Arrow from "./Arrow.vue";
 import { HTMLAttributes } from "vue";
-import { measureHeight } from "./uiConstants";
-import { useControlsStore } from "./store/controls";
+import { measureHeight } from "../uiConstants";
+import { useControlsStore } from "../store/controls";
 
 const props = defineProps<{
   measure: Measure<NoteLineWithPatternData>;

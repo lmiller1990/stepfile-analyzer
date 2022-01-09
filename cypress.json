@@ -1,4 +1,4 @@
 {
   "testFiles": "**/*.spec.ts",
-  "componentFolder": "src"
+  "componentFolder": "src/components"
 }

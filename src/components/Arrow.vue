@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import type { Quantization } from "./noteData";
-import type { Direction } from "./types";
+import type { Quantization } from "../noteData";
+import type { Direction } from "../types";
 
 const props = defineProps<{
   direction: Direction;

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { patterns } from "./patterns";
-import { useControlsStore } from "./store/controls";
-import { quantizations } from "./uiConstants";
+import { patterns } from "../patterns";
+import { useControlsStore } from "../store/controls";
+import { quantizations } from "../uiConstants";
 
 const controlsStore = useControlsStore();
 </script>

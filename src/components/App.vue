@@ -4,11 +4,11 @@ import {
   analyzePatterns,
   createAnalysisResults,
   parse,
-} from "./analysis";
-import { patterns } from "./patterns";
-import { chart } from "./chart";
+} from "../analysis";
+import { patterns } from "../patterns";
+import { chart } from "../chart";
 import ControlPanel from "./ControlPanel.vue";
-import { measureHeight } from "./uiConstants";
+import { measureHeight } from "../uiConstants";
 import MeasureC from "./Measure.vue";
 
 const data = parse(chart);
