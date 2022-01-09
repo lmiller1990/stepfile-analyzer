@@ -21,7 +21,7 @@
     "vue-tsc": "^0.29.8"
   },
   "scripts": {
-    "format": "prettier --write src/**/*.ts",
+    "format": "yarn prettier 'src/**/*{*.ts,*.vue}' --write",
     "test": "vitest --run",
     "dev": "vite"
   }

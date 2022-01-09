@@ -2,7 +2,7 @@
 import type { Direction, Measure, NoteLineWithPatternData } from "./types";
 import Arrow from "./Arrow.vue";
 import { HTMLAttributes } from "vue";
-import { measureHeight } from './uiConstants'
+import { measureHeight } from "./uiConstants";
 import { useControlsStore } from "./store/controls";
 
 const positions = new Map<Direction, number>([
@@ -16,16 +16,19 @@ const props = defineProps<{
   measure: Measure<NoteLineWithPatternData>;
 }>();
 
-const controlsStore = useControlsStore()
+const controlsStore = useControlsStore();
 
 const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
   const line = props.measure.notes[lineNumber - 1];
-  const desiredPatternQuantization = line.patterns.get(controlsStore.selectedPattern)!;
+  const desiredPatternQuantization = line.patterns.get(
+    controlsStore.selectedPattern
+  )!;
   const highlight =
-    desiredPatternQuantization === controlsStore.selectedQuantization.quantization;
-    if (highlight) {
-  console.log(line.measure, line.notePosInMeasure)
-    }
+    desiredPatternQuantization ===
+    controlsStore.selectedQuantization.quantization;
+  if (highlight) {
+    console.log(line.measure, line.notePosInMeasure);
+  }
 
   return {
     background: highlight ? "rgba(172, 215, 230, 0.50)" : "none",
@@ -36,20 +39,17 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
 
 <template>
   <div class="measure">
-
     <div
       v-for="line of props.measure.quantization"
       :style="measureStyle(line)"
       class="flex w-full"
-      :class="{ 
-        'measure-guide': line % (props.measure.quantization / 4) === 0 && line !== props.measure.quantization,
+      :class="{
+        'measure-guide':
+          line % (props.measure.quantization / 4) === 0 &&
+          line !== props.measure.quantization,
       }"
     >
-      <div
-        v-for="num of [1, 2, 3, 4]"
-        class="w-full relative"
-        :key="num"
-      >
+      <div v-for="num of [1, 2, 3, 4]" class="w-full relative" :key="num">
         <Arrow
           v-if="measure.notes[line - 1].left && num === 1"
           direction="left"
@@ -74,9 +74,7 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
           :quantization="measure.notes[line - 1].noteQuantization"
         />
       </div>
-
-    </div> 
-
+    </div>
   </div>
 </template>
 
@@ -90,7 +88,7 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
   border: 1px solid black;
   border-bottom: none;
   display: grid;
-  grid-template-rows: repeat(4, 1fr); 
+  grid-template-rows: repeat(4, 1fr);
 }
 
 .measure-debug {

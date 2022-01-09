@@ -194,7 +194,7 @@ export const chart = `1000
 0001
 1000
 0001
-,`
+,`;
 
 export const uberRave = `1001
 0001
@@ -1429,4 +1429,4 @@ export const uberRave = `1001
 0000
 0000
 0000
-,`
+,`;

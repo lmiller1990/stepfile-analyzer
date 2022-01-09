@@ -11,7 +11,7 @@ import type { Direction, Measure, NoteLineWithPatternData } from "./types";
 import { quantization } from "./noteData";
 import { chart, uberRave } from "./chart";
 import ControlPanel from "./ControlPanel.vue";
-import { measureHeight } from './uiConstants'
+import { measureHeight } from "./uiConstants";
 import Arrow from "./Arrow.vue";
 import MeasureC from "./Measure.vue";
 
@@ -77,13 +77,12 @@ function setQuantization(q: typeof quantizations[number]) {
   <div id="main-container">
     <div id="chart-container" class="border border-2">
       <div id="measure-container">
-
         <MeasureC
           v-for="measure of measures"
           :measure="measure"
           :key="measure.number"
         />
-          <!-- :style="{ height: `${measureHeight}px`, width: `${measureWidth}px` }" -->
+        <!-- :style="{ height: `${measureHeight}px`, width: `${measureWidth}px` }" -->
         <!--
         <div
           class="measure"
@@ -144,22 +143,19 @@ function setQuantization(q: typeof quantizations[number]) {
           </div>
         </div>
         -->
-
-      </div> 
+      </div>
     </div>
 
     <div id="controls-container" class="border border-2">
       <ControlPanel />
     </div>
 
-    <div id="bottom-half" class="border border-2">
-      bottom
-    </div>
+    <div id="bottom-half" class="border border-2">bottom</div>
   </div>
 
   <!-- <div class="flex"> -->
 
-    <!-- 
+  <!-- 
     -->
 
   <!-- </div> -->

@@ -1,5 +1,10 @@
 import { QuantizationError } from "./errors";
-import { noteData, Quantization, quantization, highestCommonDenominator } from "./noteData";
+import {
+  noteData,
+  Quantization,
+  quantization,
+  highestCommonDenominator,
+} from "./noteData";
 import type { PatternBag } from "./patterns";
 import type {
   ContainedNote,
@@ -260,9 +265,7 @@ function sequential(notes: ContainedNote[]) {
 }
 
 function allSameQuantization(notes: ContainedNote[]) {
-  return notes.every(
-    (x) => x.noteQuantization === notes[0].noteQuantization
-  );
+  return notes.every((x) => x.noteQuantization === notes[0].noteQuantization);
 }
 
 /**
@@ -333,8 +336,8 @@ export function createVirtualizedMeasure(
   // 0000
   // 0000
   // then we just see if they are sequential like in case 1
-  const m1Quan = m1Notes[0].measureQuantization 
-  const m2Quan = m2Notes[0].measureQuantization
+  const m1Quan = m1Notes[0].measureQuantization;
+  const m2Quan = m2Notes[0].measureQuantization;
 
   if (m1Quan === m2Quan) {
     return containedNotePositionsInMeasure.map((x) => {
@@ -360,7 +363,7 @@ export function createVirtualizedMeasure(
   // 0100 "4th note" (pos: 1 -> pos: 1)
   // 0000 "16th note" <- remove
   // 1000 "8th note" (pos: 3 -> pos: 2)
-  // 0000 "16th note" <- remove 
+  // 0000 "16th note" <- remove
   // 0000 "4th note" <- pos: 5 -> pos: 3
   // 0000 "16th note" <- remove
   // 0000 "8th note" pos: 7 -> pos: 4
@@ -369,52 +372,51 @@ export function createVirtualizedMeasure(
   // 0100 "4th note" pos: 1 -> pos: 1
   // 0000 "16th note" <- remove
   // 1000 "8th note" <- remove
-  // 0000 "16th note" <- remove 
+  // 0000 "16th note" <- remove
   // 0000 "4th note" <- pos: 5 -> pos: 2
-  
+
   // figuring out how much to change the note position is kind of tricky.
   // for q=16 -> q=8, every second note is removed, and every subsequent note increases
   // it's position by the length of the new, normalized array + 1.
 
   if (m1Quan < m2Quan) {
-    const d = highestCommonDenominator(m2Quan, m1Quan)
-    const skip = m2Quan / d
-    const transformMap = new Map<number, number>()
-    let j = 0
+    const d = highestCommonDenominator(m2Quan, m1Quan);
+    const skip = m2Quan / d;
+    const transformMap = new Map<number, number>();
+    let j = 0;
     for (let i = 0; i < m2Quan; i++) {
       // this note is valid
       if (i % skip === 0) {
-        transformMap.set(i + 1, j + 1)
-        j++
+        transformMap.set(i + 1, j + 1);
+        j++;
       }
     }
 
-    return containedNotePositionsInMeasure.map(x => {
+    return containedNotePositionsInMeasure.map((x) => {
       if (x.measureNumber === m1) {
-        return x
+        return x;
       }
 
       return {
         ...x,
-        notePosInMeasure: transformMap.get(x.notePosInMeasure)! + m1Quan
-      }
-    })
+        notePosInMeasure: transformMap.get(x.notePosInMeasure)! + m1Quan,
+      };
+    });
   } else {
+    const d = highestCommonDenominator(m2Quan, m1Quan);
+    const skip = m1Quan / d;
 
-    const d = highestCommonDenominator(m2Quan, m1Quan)
-    const skip = m1Quan / d
-
-    const transformMap = new Map<number, number>()
-    let j = 0
+    const transformMap = new Map<number, number>();
+    let j = 0;
     for (let i = 0; i < m2Quan; i++) {
       // this note is valid
       if (i % skip === 0) {
-        transformMap.set(i + 1, j + 1)
-        j++
+        transformMap.set(i + 1, j + 1);
+        j++;
       }
     }
 
-    return containedNotePositionsInMeasure.map(x => {
+    return containedNotePositionsInMeasure.map((x) => {
       if (x.measureNumber === m1) {
         return {
           ...x,
@@ -424,9 +426,9 @@ export function createVirtualizedMeasure(
 
       return {
         ...x,
-        notePosInMeasure: x.notePosInMeasure + m1Quan
-      }
-    })
+        notePosInMeasure: x.notePosInMeasure + m1Quan,
+      };
+    });
   }
 }
 
@@ -465,10 +467,7 @@ export function getPatternQuantization(
     data.containedNotePositionsInMeasure
   );
   if (
-    allDivisibleBy(
-      data.containedNotePositionsInMeasure,
-      highestQuantization
-    ) &&
+    allDivisibleBy(data.containedNotePositionsInMeasure, highestQuantization) &&
     sequential(data.containedNotePositionsInMeasure)
   ) {
     return highestQuantization;

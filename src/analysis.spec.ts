@@ -74,10 +74,10 @@ describe("analyzePatterns", () => {
 
     expect(pattern.patternQuantization).toBe(4);
   });
-})
+});
 
-  it("works across measures with same quantization", () => {
-    const data = `0000
+it("works across measures with same quantization", () => {
+  const data = `0000
     0000
     0010
     0001
@@ -88,26 +88,26 @@ describe("analyzePatterns", () => {
     0000
     ,`;
 
-    const { lines, measures } = parse(data);
+  const { lines, measures } = parse(data);
 
-    const patterns: PatternBag = {
-      "urd-candle": [up, right, down],
-    };
+  const patterns: PatternBag = {
+    "urd-candle": [up, right, down],
+  };
 
-    const analysis = createAnalysisResults(patterns);
+  const analysis = createAnalysisResults(patterns);
 
-    const actual = analyzePatterns(analysis, lines, measures, patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual["urd-candle"].count).toBe(1);
-    expect(actual["urd-candle"].count).toBe(1);
+  expect(actual["urd-candle"].count).toBe(1);
+  expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("3")!;
+  const pattern = actual["urd-candle"].collection.get("3")!;
 
-    expect(pattern.patternQuantization).toBe(4);
-  });
+  expect(pattern.patternQuantization).toBe(4);
+});
 
-  it("works across measures with different quantization, m1 < m2", () => {
-    const data = `0000
+it("works across measures with different quantization, m1 < m2", () => {
+  const data = `0000
     0000
     0010
     0001
@@ -122,26 +122,26 @@ describe("analyzePatterns", () => {
     0000
     ,`;
 
-    const { lines, measures } = parse(data);
+  const { lines, measures } = parse(data);
 
-    const patterns: PatternBag = {
-      "urd-candle": [up, right, down],
-    };
+  const patterns: PatternBag = {
+    "urd-candle": [up, right, down],
+  };
 
-    const analysis = createAnalysisResults(patterns);
+  const analysis = createAnalysisResults(patterns);
 
-    const actual = analyzePatterns(analysis, lines, measures, patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual["urd-candle"].count).toBe(1);
-    expect(actual["urd-candle"].count).toBe(1);
+  expect(actual["urd-candle"].count).toBe(1);
+  expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("3")!;
+  const pattern = actual["urd-candle"].collection.get("3")!;
 
-    expect(pattern.patternQuantization).toBe(4);
-  });
+  expect(pattern.patternQuantization).toBe(4);
+});
 
-  it("detects uneven pattern, m1 > m2", () => {
-    const data = `0000
+it("detects uneven pattern, m1 > m2", () => {
+  const data = `0000
     0000
     0000
     0000
@@ -156,26 +156,26 @@ describe("analyzePatterns", () => {
     0000
     ,`;
 
-    const { lines, measures } = parse(data);
+  const { lines, measures } = parse(data);
 
-    const patterns: PatternBag = {
-      "urd-candle": [up, right, down],
-    };
+  const patterns: PatternBag = {
+    "urd-candle": [up, right, down],
+  };
 
-    const analysis = createAnalysisResults(patterns);
+  const analysis = createAnalysisResults(patterns);
 
-    const actual = analyzePatterns(analysis, lines, measures, patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual["urd-candle"].count).toBe(1);
-    expect(actual["urd-candle"].count).toBe(1);
+  expect(actual["urd-candle"].count).toBe(1);
+  expect(actual["urd-candle"].count).toBe(1);
 
-    const pattern = actual["urd-candle"].collection.get("7")!;
+  const pattern = actual["urd-candle"].collection.get("7")!;
 
-    expect(pattern.patternQuantization).toBe(0);
-  });
+  expect(pattern.patternQuantization).toBe(0);
+});
 
-  it("detects uneven pattern, m1 < m2", () => {
-    const data = `0000
+it("detects uneven pattern, m1 < m2", () => {
+  const data = `0000
     0000
     0000
     0001
@@ -190,40 +190,40 @@ describe("analyzePatterns", () => {
     0000
     ,`;
 
-    const { lines, measures } = parse(data);
+  const { lines, measures } = parse(data);
 
-    const patterns: PatternBag = {
-      "rrrr-jack": [right, right, right, right],
-    };
+  const patterns: PatternBag = {
+    "rrrr-jack": [right, right, right, right],
+  };
 
-    const analysis = createAnalysisResults(patterns);
+  const analysis = createAnalysisResults(patterns);
 
-    const actual = analyzePatterns(analysis, lines, measures, patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual["rrrr-jack"].count).toBe(1);
-    expect(actual["rrrr-jack"].count).toBe(1);
+  expect(actual["rrrr-jack"].count).toBe(1);
+  expect(actual["rrrr-jack"].count).toBe(1);
 
-    const pattern = actual["rrrr-jack"].collection.get("4")!;
+  const pattern = actual["rrrr-jack"].collection.get("4")!;
 
-    expect(pattern.patternQuantization).toBe(4);
-  });
+  expect(pattern.patternQuantization).toBe(4);
+});
 
-  it("double taps", () => {
-    const { lines, measures } = parse(`1000
+it("double taps", () => {
+  const { lines, measures } = parse(`1000
 1000
 1000
 1000
 ,`);
 
-    const patterns: PatternBag = {
-      ll: [left, left],
-    };
+  const patterns: PatternBag = {
+    ll: [left, left],
+  };
 
-    const analysis = createAnalysisResults(patterns);
-    const actual = analyzePatterns(analysis, lines, measures, patterns);
+  const analysis = createAnalysisResults(patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual["ll"].count).toBe(3);
-  });
+  expect(actual["ll"].count).toBe(3);
+});
 
 //   // HERE
 //   it("sweep pattern across measures", () => {
@@ -272,8 +272,8 @@ describe("analyzePatterns", () => {
 //     expect(pattern.patternQuantization).toBe(8);
 //   });
 
-  it("quantization", () => {
-    const { lines, measures } = parse(`1000
+it("quantization", () => {
+  const { lines, measures } = parse(`1000
 0000
 1000
 0000
@@ -283,22 +283,22 @@ describe("analyzePatterns", () => {
 1000
 ,`);
 
-    const patterns: PatternBag = {
-      ll: [left, left],
-      lll: [left, left, left],
-      llll: [left, left, left, left],
-    };
+  const patterns: PatternBag = {
+    ll: [left, left],
+    lll: [left, left, left],
+    llll: [left, left, left, left],
+  };
 
-    const analysis = createAnalysisResults(patterns);
-    const actual = analyzePatterns(analysis, lines, measures, patterns);
+  const analysis = createAnalysisResults(patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual["ll"].count).toBe(5);
-    expect(actual["lll"].count).toBe(4);
-    expect(actual["llll"].count).toBe(3);
-  });
+  expect(actual["ll"].count).toBe(5);
+  expect(actual["lll"].count).toBe(4);
+  expect(actual["llll"].count).toBe(3);
+});
 
-  it("16th candles", () => {
-    const { lines, measures } = parse(`0010
+it("16th candles", () => {
+  const { lines, measures } = parse(`0010
 0001
 0100
 0010
@@ -316,18 +316,18 @@ describe("analyzePatterns", () => {
 0000
 ,`);
 
-    const patterns: PatternBag = {
-      "urd-candle": [up, right, down],
-      "uld-candle": [up, left, down],
-      "dlu-candle": [down, left, up],
-      "dru-candle": [down, right, up],
-    };
+  const patterns: PatternBag = {
+    "urd-candle": [up, right, down],
+    "uld-candle": [up, left, down],
+    "dlu-candle": [down, left, up],
+    "dru-candle": [down, right, up],
+  };
 
-    const analysis = createAnalysisResults(patterns);
-    const actual = analyzePatterns(analysis, lines, measures, patterns);
+  const analysis = createAnalysisResults(patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-    expect(actual).toMatchSnapshot();
-  });
+  expect(actual).toMatchSnapshot();
+});
 // });
 
 describe("addPatternDataToMeasures", () => {

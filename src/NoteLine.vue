@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-import { HTMLAttributes } from 'vue';
-import { Measure, NoteLineWithPatternData } from './types';
+import { HTMLAttributes } from "vue";
+import { Measure, NoteLineWithPatternData } from "./types";
 
-const measureHeight = 400
+const measureHeight = 400;
 
 const props = defineProps<{
-  line: number
-  measure: Measure<NoteLineWithPatternData>
-}>()
+  line: number;
+  measure: Measure<NoteLineWithPatternData>;
+}>();
 
 const measureStyle = (): HTMLAttributes["style"] => {
   const line = props.measure.notes[props.line - 1];
   // const desiredPatternQuantization = line.patterns.get(selectedPattern.value)!;
-  const highlight = false
+  const highlight = false;
   //   desiredPatternQuantization === selectedQuantization.value.quantization;
 
   return {
@@ -21,15 +21,10 @@ const measureStyle = (): HTMLAttributes["style"] => {
     height: `${measureHeight / props.measure.quantization}px`,
   };
 };
-
 </script>
 
 <template>
-  <div 
-    :style="measureStyle"
-    class="line"
-    >
-  </div>
+  <div :style="measureStyle" class="line"></div>
 </template>
 
 <style scoped>
@@ -39,5 +34,4 @@ const measureStyle = (): HTMLAttributes["style"] => {
   display: flex;
   width: 100%;
 }
-
 </style>

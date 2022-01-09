@@ -4,7 +4,7 @@ import { quantizations } from "../uiConstants";
 type UIQuantization = typeof quantizations[number];
 
 interface ControlsStoreState {
-  selectedPattern: string
+  selectedPattern: string;
   selectedQuantization: UIQuantization;
 }
 

@@ -7,15 +7,20 @@ export type Note = typeof up | typeof down | typeof right | typeof left;
 
 export type PatternBag = Record<string, readonly Note[]>;
 
-type PatternCategory = 'candle' | 'sweep' | 'jack' | 'staircase' | 'crossover' | 'trill'
+type PatternCategory =
+  | "candle"
+  | "sweep"
+  | "jack"
+  | "staircase"
+  | "crossover"
+  | "trill";
 
 interface Pattern {
-  id: string
-  category: PatternCategory
+  id: string;
+  category: PatternCategory;
 }
 
-const allPatterns = [
-]
+const allPatterns = [];
 
 export const patterns: PatternBag = {
   "urd-candle": [up, right, down],

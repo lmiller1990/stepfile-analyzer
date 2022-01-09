@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { ref } from "vue";
 import { patterns } from "./patterns";
 import { useControlsStore } from "./store/controls";
 import { quantizations } from "./uiConstants";

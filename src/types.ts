@@ -14,9 +14,9 @@ export interface NoteLine {
 }
 
 export interface Measure<T = NoteLine> {
-  number: number
-  quantization: number
-  notes: T[]
+  number: number;
+  quantization: number;
+  notes: T[];
 }
 
 export type Direction = "left" | "right" | "up" | "down";
@@ -49,7 +49,7 @@ export interface PatternData {
   // 0000
   // a three note jackhammer of 4ths would contain note 1, 2, 3.
   // useful for building a nice UI to visualize the patterns.
-  containedNotePositionsInMeasure: ContainedNote[]
+  containedNotePositionsInMeasure: ContainedNote[];
 }
 
 export interface PatternAnalysis {
