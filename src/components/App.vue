@@ -32,7 +32,6 @@ const output = computed(() => {
     measures,
   };
 });
-
 </script>
 
 <template>

@@ -27,7 +27,7 @@ const patternsByQuantization = (pattern: string) => {
     return acc;
   }, new Map(quantization.map((x) => [x, 0])));
 
-  countMap.delete(0)
+  countMap.delete(0);
 
   for (const q of [...quantization].reverse()) {
     if (countMap.get(q) === 0) {

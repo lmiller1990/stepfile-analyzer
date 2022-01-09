@@ -5,13 +5,13 @@ import { useChartStore } from "../store/chart";
 const chartStore = useChartStore();
 
 function handleInput(event: Event) {
-  const id = (event.target as HTMLSelectElement).value
-  chartStore.setSelectedChartId(id)
+  const id = (event.target as HTMLSelectElement).value;
+  chartStore.setSelectedChartId(id);
 }
 </script>
 
 <template>
-{{ chartStore.selectedChart.id }}
+  {{ chartStore.selectedChart.id }}
   <select :value="chartStore.selectedChartId" @input="handleInput">
     <option
       v-for="chart of charts.values()"

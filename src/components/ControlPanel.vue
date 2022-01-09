@@ -2,7 +2,7 @@
 import { patterns } from "../patterns";
 import { useControlsStore } from "../store/controls";
 import { quantizations } from "../uiConstants";
-import SelectChart from './SelectChart.vue'
+import SelectChart from "./SelectChart.vue";
 
 const controlsStore = useControlsStore();
 </script>

@@ -361,7 +361,7 @@ describe("addPatternDataToMeasures", () => {
 ,`);
 
     const patterns: PatternBag = {
-      "uld-candle": allPatterns["uld-candle"]
+      "uld-candle": allPatterns["uld-candle"],
     };
 
     const analysis = createAnalysisResults(patterns);
