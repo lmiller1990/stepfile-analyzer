@@ -36,11 +36,11 @@ const output = computed(() => {
 <template>
   <div class="flex justify-center">
     <div id="main-container">
-      <div id="stats-container" class="border border-left border-black p-4">
+      <div id="stats-container" class="border border-left border-black p-4 is-container">
         <StatsPanel :analysis="output.analysis" />
       </div>
 
-      <div id="chart-container" class="flex justify-center">
+      <div id="chart-container" class="flex justify-center is-container">
         <div id="measure-container">
           <MeasureC
             v-for="measure of output.measures"
@@ -50,12 +50,13 @@ const output = computed(() => {
         </div>
       </div>
 
-      <div id="controls-container" class="border border-right border-black p-4">
+      <div id="controls-container" class="border border-right border-black p-4 is-container">
         <ControlPanel />
       </div>
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .note {
@@ -68,6 +69,8 @@ const output = computed(() => {
 
 #main-container {
   /* max-width: 800px; */
+  box-sizing: border-box;
+  padding: 10px;
   gap: 5px;
   display: grid;
   grid-template-columns: 1.5fr 1fr 1.5fr;
@@ -77,6 +80,10 @@ const output = computed(() => {
 }
 
 #chart-container {
+  overflow: scroll;
+}
+
+.is-container {
   overflow: scroll;
 }
 
