@@ -1,30 +1,11 @@
 <script lang="ts" setup>
-import {
-  PatternBagData,
-  patternCategories,
-  PatternCategory,
-  patterns,
-} from "../patterns";
 import { useControlsStore } from "../store/controls";
 import { quantizations } from "../uiConstants";
+import { patternsByCategory } from "../utils";
 import SelectChart from "./SelectChart.vue";
 
 const controlsStore = useControlsStore();
 
-interface ByCategory {
-  category: string;
-  data: PatternBagData[];
-}
-
-const formatLabel = (s: string) => `${s[0].toUpperCase()}${s.slice(1)}s`;
-
-const patternsByCategory = patternCategories.map<ByCategory>((category) => {
-  const byCat: ByCategory = {
-    category: formatLabel(category),
-    data: Object.values(patterns).filter((x) => x.category === category),
-  };
-  return byCat;
-});
 </script>
 
 <template>
@@ -54,7 +35,7 @@ const patternsByCategory = patternCategories.map<ByCategory>((category) => {
           v-for="patternData of patternsByCategory"
           :key="patternData.category"
         >
-          <h2 class="text-xl my-2">{{ patternData.category }}</h2>
+          <h2>{{ patternData.category }}</h2>
 
           <div class="pattern-container">
             <div v-for="pattern of patternData.data" :key="pattern.id">
@@ -83,9 +64,5 @@ const patternsByCategory = patternCategories.map<ByCategory>((category) => {
 .pattern-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-}
-
-h1 {
-  @apply text-2xl text-center my-2;
 }
 </style>

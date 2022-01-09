@@ -18,9 +18,9 @@ export const patternCategories = [
   "candle",
   "sweep",
   "jack",
-  "staircase",
   "crossover",
   "drill",
+  "staircase",
 ] as const;
 
 export type PatternCategory = typeof patternCategories[number];
@@ -55,6 +55,31 @@ for (const d1 of dirs) {
 }
 
 export const patterns: PatternBag = {
+  "ldr-crossover": {
+    id: "ldr-crossover",
+    label: "LDR Crossover",
+    notes: [left, down, right],
+    category: "crossover",
+  },
+  "lur-crossover": {
+    id: "lur-crossover",
+    label: "LUR Crossover",
+    notes: [left, up, right],
+    category: "crossover",
+  },
+  "rul-crossover": {
+    id: "rul-crossover",
+    label: "RUL Crossover",
+    notes: [right, up, left],
+    category: "crossover",
+  },
+  "rdl-crossover": {
+    id: "rdl-crossover",
+    label: "RDL Crossover",
+    notes: [right, down, left],
+    category: "crossover",
+  },
+
   "urd-candle": {
     id: "urd-candle",
     label: "URD Candle",

@@ -11,17 +11,19 @@ function handleInput(event: Event) {
 </script>
 
 <template>
-  {{ chartStore.selectedChart.id }}
-  <select :value="chartStore.selectedChartId" @input="handleInput">
-    <option
-      v-for="chart of charts.values()"
-      :id="chart.id"
-      :value="chart.id"
-      :key="chart.id"
-    >
-      {{ chart.name }}
-    </option>
-  </select>
+  <div class="flex items-center justify-around">
+    <h3>Select Chart:</h3>
+    <select :value="chartStore.selectedChartId" @input="handleInput">
+      <option
+        v-for="chart of charts.values()"
+        :id="chart.id"
+        :value="chart.id"
+        :key="chart.id"
+      >
+        {{ chart.name }}
+      </option>
+    </select>
+  </div>
 </template>
 
 <style scoped></style>

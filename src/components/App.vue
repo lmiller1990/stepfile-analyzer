@@ -67,10 +67,10 @@ const output = computed(() => {
 }
 
 #main-container {
-  max-width: 800px;
+  /* max-width: 800px; */
   gap: 5px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1.5fr;
+  grid-template-columns: 1.5fr 1fr 1.5fr;
   grid-template-rows: 1fr;
   /* justify-items: center; */
   height: 100vh;
