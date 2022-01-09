@@ -11,7 +11,6 @@ import { measureHeight } from "../uiConstants";
 import MeasureC from "./Measure.vue";
 import { useChartStore } from "../store/chart";
 import StatsPanel from "./StatsPanel.vue";
-import ChartPanel from "./ChartPanel.vue";
 import { computed } from "vue";
 
 const chartStore = useChartStore();
@@ -35,30 +34,26 @@ const output = computed(() => {
 </script>
 
 <template>
-  <div id="main-container">
-    <div id="stats-container" class="border border-2">
-      <StatsPanel :analysis="output.analysis" />
-    </div>
+  <div class="flex justify-center">
+    <div id="main-container">
+      <div id="stats-container" class="border border-left border-black p-4">
+        <StatsPanel :analysis="output.analysis" />
+      </div>
 
-    <div id="chart-container" class="border border-2">
-      <div id="measure-container">
-        <MeasureC
-          v-for="measure of output.measures"
-          :measure="measure"
-          :key="measure.number"
-        />
+      <div id="chart-container" class="flex justify-center">
+        <div id="measure-container">
+          <MeasureC
+            v-for="measure of output.measures"
+            :measure="measure"
+            :key="measure.number"
+          />
+        </div>
+      </div>
+
+      <div id="controls-container" class="border border-right border-black p-4">
+        <ControlPanel />
       </div>
     </div>
-
-    <div id="controls-container" class="border border-2">
-      <ControlPanel />
-    </div>
-
-    <!-- 
-      <div id="bottom-half" class="border border-2">
-      <ChartPanel />
-    </div> 
-    -->
   </div>
 </template>
 
@@ -72,9 +67,12 @@ const output = computed(() => {
 }
 
 #main-container {
+  max-width: 800px;
+  gap: 5px;
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: 1fr 1fr 1.5fr;
   grid-template-rows: 1fr;
+  /* justify-items: center; */
   height: 100vh;
 }
 

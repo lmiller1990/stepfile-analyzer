@@ -5,22 +5,25 @@ export const right = "0001";
 
 export type Note = typeof up | typeof down | typeof right | typeof left;
 
-export type PatternBag = Record<string, PatternData>;
+export type PatternBag = Record<string, PatternBagData>;
 
-interface PatternData {
+export interface PatternBagData {
   id: string;
   notes: readonly Note[];
   label: string;
   category: PatternCategory;
 }
 
-type PatternCategory =
-  | "candle"
-  | "sweep"
-  | "jack"
-  | "staircase"
-  | "crossover"
-  | "drill";
+export const patternCategories = [
+  "candle",
+  "sweep",
+  "jack",
+  "staircase",
+  "crossover",
+  "drill",
+] as const;
+
+export type PatternCategory = typeof patternCategories[number];
 
 /**
  * generate all combinations of
