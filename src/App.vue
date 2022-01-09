@@ -24,12 +24,9 @@ const measures = addPatternDataToMeasures(data.measures, analysis);
 
 <template>
   <div id="main-container">
-    <div id="stats-container" class="border border-2">
-      Stats
-    </div>
+    <div id="stats-container" class="border border-2">Stats</div>
 
     <div id="chart-container" class="border border-2">
-
       <div id="measure-container">
         <MeasureC
           v-for="measure of measures"

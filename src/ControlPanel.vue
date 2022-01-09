@@ -15,8 +15,9 @@ const controlsStore = useControlsStore();
           <input
             :id="name"
             :value="name"
-            type="radio"
-            v-model="controlsStore.selectedPattern"
+            type="checkbox"
+            :checked="controlsStore.selectedPatterns.has(name)"
+            @input="controlsStore.togglePattern(name)"
           />
           <label :for="name">{{ name }}</label>
         </div>
@@ -27,11 +28,11 @@ const controlsStore = useControlsStore();
       <h1>Quantization</h1>
       <div v-for="q of quantizations" :key="q.id">
         <input
-          type="radio"
+          type="checkbox"
           :id="q.id"
           :value="q.id"
-          :checked="q.id === controlsStore.selectedQuantization.id"
-          @input="controlsStore.setSetQuantization(q)"
+          :checked="controlsStore.selectedQuantizations.has(q)"
+          @input="controlsStore.toggleQuantization(q)"
         />
         <label :for="q.id">{{ q.name }}</label>
       </div>

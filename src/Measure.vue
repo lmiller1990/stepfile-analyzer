@@ -4,6 +4,7 @@ import Arrow from "./Arrow.vue";
 import { HTMLAttributes } from "vue";
 import { measureHeight } from "./uiConstants";
 import { useControlsStore } from "./store/controls";
+import { intersection } from "./utils";
 
 const positions = new Map<Direction, number>([
   ["left", 0],
@@ -20,15 +21,24 @@ const controlsStore = useControlsStore();
 
 const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
   const line = props.measure.notes[lineNumber - 1];
-  const desiredPatternQuantization = line.patterns.get(
-    controlsStore.selectedPattern
-  )!;
-  const highlight =
-    desiredPatternQuantization ===
-    controlsStore.selectedQuantization.quantization;
-  if (highlight) {
-    console.log(line.measure, line.notePosInMeasure);
-  }
+  const highlight = Array.from(line.patterns).some(
+    ([pattern, quantization]) => {
+      const hasPattern = controlsStore.selectedPatterns.has(pattern);
+      const hasQuan =
+        controlsStore.selectedQuantizationNumbers.includes(quantization);
+      return hasPattern && hasQuan;
+    }
+  );
+  //   Array.from(line.patterns.keys()),
+  //   Array.from(controlsStore.selectedPatterns)
+  // ).map((x) => line.patterns.get(x));
+
+  // const highlight = containedPatterns.some(x => Array.from(controlsStore.selectedQuantizations.values()).includes(x))
+  // desiredPatternQuantization && de
+  // controlsStore.selectedQuantizations.has() ?? false;
+  // if (highlight) {
+  //   console.log(line.measure, line.notePosInMeasure);
+  // }
 
   return {
     background: highlight ? "rgba(172, 215, 230, 0.50)" : "none",

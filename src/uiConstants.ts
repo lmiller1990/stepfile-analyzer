@@ -1,6 +1,12 @@
-import { quantization } from "./noteData";
+import { Quantization, quantization } from "./noteData";
 
-export const quantizations = quantization.map((x) => ({
+export interface UIQuantization {
+  id: `q-${Quantization}`;
+  quantization: Quantization;
+  name: `${Quantization}${"th" | "nd"}`;
+}
+
+export const quantizations: UIQuantization[] = quantization.map((x) => ({
   id: `q-${x}`,
   quantization: x,
   name: x === 32 || 192 ? `${x}nd` : `${x}th`,
