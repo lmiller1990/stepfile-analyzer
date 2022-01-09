@@ -23,6 +23,9 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
   const desiredPatternQuantization = line.patterns.get(controlsStore.selectedPattern)!;
   const highlight =
     desiredPatternQuantization === controlsStore.selectedQuantization.quantization;
+    if (highlight) {
+  console.log(line.measure, line.notePosInMeasure)
+    }
 
   return {
     background: highlight ? "rgba(172, 215, 230, 0.50)" : "none",

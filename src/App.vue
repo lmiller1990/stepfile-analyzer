@@ -191,7 +191,6 @@ function setQuantization(q: typeof quantizations[number]) {
 }
 
 #measure-container {
-  margin: 50px 0 0 0;
   height: 100%;
   width: 200px;
   display: grid;

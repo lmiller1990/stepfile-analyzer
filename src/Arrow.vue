@@ -45,7 +45,7 @@ const style = computed(() => {
   const top = root.value ? root.value.getBoundingClientRect().height / 2 : 0;
   return {
     transform: `rotate(${rotation})`,
-    top: `-${top}px`,
+    // top: `-${top}px`,
   };
 });
 </script>
