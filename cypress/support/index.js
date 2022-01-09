@@ -16,9 +16,6 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 import '../../src/index.css'
-import { setActivePinia, createPinia } from 'pinia'
-
-setActivePinia(createPinia())
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

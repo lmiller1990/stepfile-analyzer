@@ -1,15 +1,20 @@
 import { Quantization, quantization } from "./noteData";
 
+type QuantizationLabel = `${Quantization}${"th" | "nd"}`;
 export interface UIQuantization {
   id: `q-${Quantization}`;
   quantization: Quantization;
-  name: `${Quantization}${"th" | "nd"}`;
+  name: QuantizationLabel;
+}
+
+export function quantizationLabel(q: Quantization): QuantizationLabel {
+  return q === 32 || 192 ? `${q}nd` : `${q}th`;
 }
 
 export const quantizations: UIQuantization[] = quantization.map((x) => ({
   id: `q-${x}`,
   quantization: x,
-  name: x === 32 || 192 ? `${x}nd` : `${x}th`,
+  name: quantizationLabel(x),
 }));
 
 const val = 400;

@@ -2,12 +2,14 @@
 import { patterns } from "../patterns";
 import { useControlsStore } from "../store/controls";
 import { quantizations } from "../uiConstants";
+import SelectChart from './SelectChart.vue'
 
 const controlsStore = useControlsStore();
 </script>
 
 <template>
   <div class="h-full w-full">
+    <SelectChart />
     <div class="flex">
       <div>
         <h1>Patterns</h1>

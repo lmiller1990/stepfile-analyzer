@@ -6,12 +6,15 @@ import {
   parse,
 } from "../analysis";
 import { patterns } from "../patterns";
-import { chart } from "../chart";
 import ControlPanel from "./ControlPanel.vue";
 import { measureHeight } from "../uiConstants";
 import MeasureC from "./Measure.vue";
+import { useChartStore } from "../store/chart";
+import StatsPanel from "./StatsPanel.vue";
 
-const data = parse(chart);
+const chartStore = useChartStore();
+
+const data = parse(chartStore.selectedChart.data);
 const analysis = analyzePatterns(
   createAnalysisResults(patterns),
   data.lines,
@@ -24,7 +27,9 @@ const measures = addPatternDataToMeasures(data.measures, analysis);
 
 <template>
   <div id="main-container">
-    <div id="stats-container" class="border border-2">Stats</div>
+    <div id="stats-container" class="border border-2">
+      <StatsPanel :analysis="analysis" />
+    </div>
 
     <div id="chart-container" class="border border-2">
       <div id="measure-container">
