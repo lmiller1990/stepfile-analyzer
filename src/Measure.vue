@@ -4,14 +4,6 @@ import Arrow from "./Arrow.vue";
 import { HTMLAttributes } from "vue";
 import { measureHeight } from "./uiConstants";
 import { useControlsStore } from "./store/controls";
-import { intersection } from "./utils";
-
-const positions = new Map<Direction, number>([
-  ["left", 0],
-  ["down", 1],
-  ["up", 2],
-  ["right", 3],
-]);
 
 const props = defineProps<{
   measure: Measure<NoteLineWithPatternData>;
@@ -29,16 +21,6 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
       return hasPattern && hasQuan;
     }
   );
-  //   Array.from(line.patterns.keys()),
-  //   Array.from(controlsStore.selectedPatterns)
-  // ).map((x) => line.patterns.get(x));
-
-  // const highlight = containedPatterns.some(x => Array.from(controlsStore.selectedQuantizations.values()).includes(x))
-  // desiredPatternQuantization && de
-  // controlsStore.selectedQuantizations.has() ?? false;
-  // if (highlight) {
-  //   console.log(line.measure, line.notePosInMeasure);
-  // }
 
   return {
     background: highlight ? "rgba(172, 215, 230, 0.50)" : "none",
