@@ -11,30 +11,40 @@ import { measureHeight } from "../uiConstants";
 import MeasureC from "./Measure.vue";
 import { useChartStore } from "../store/chart";
 import StatsPanel from "./StatsPanel.vue";
+import ChartPanel from "./ChartPanel.vue";
+import { computed } from "vue";
 
 const chartStore = useChartStore();
 
-const data = parse(chartStore.selectedChart.data);
-const analysis = analyzePatterns(
-  createAnalysisResults(patterns),
-  data.lines,
-  data.measures,
-  patterns
-);
+const output = computed(() => {
+  const data = parse(chartStore.selectedChart.data);
+  const analysis = analyzePatterns(
+    createAnalysisResults(patterns),
+    data.lines,
+    data.measures,
+    patterns
+  );
 
-const measures = addPatternDataToMeasures(data.measures, analysis);
+  const measures = addPatternDataToMeasures(data.measures, analysis);
+
+  return {
+    analysis,
+    measures,
+  };
+});
+
 </script>
 
 <template>
   <div id="main-container">
     <div id="stats-container" class="border border-2">
-      <StatsPanel :analysis="analysis" />
+      <StatsPanel :analysis="output.analysis" />
     </div>
 
     <div id="chart-container" class="border border-2">
       <div id="measure-container">
         <MeasureC
-          v-for="measure of measures"
+          v-for="measure of output.measures"
           :measure="measure"
           :key="measure.number"
         />
@@ -45,7 +55,11 @@ const measures = addPatternDataToMeasures(data.measures, analysis);
       <ControlPanel />
     </div>
 
-    <div id="bottom-half" class="border border-2">bottom</div>
+    <!-- 
+      <div id="bottom-half" class="border border-2">
+      <ChartPanel />
+    </div> 
+    -->
   </div>
 </template>
 
@@ -61,7 +75,7 @@ const measures = addPatternDataToMeasures(data.measures, analysis);
 #main-container {
   display: grid;
   grid-template-columns: 1fr 3fr 1fr;
-  grid-template-rows: 5fr 1fr;
+  grid-template-rows: 1fr;
   height: 100vh;
 }
 

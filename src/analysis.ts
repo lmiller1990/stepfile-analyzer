@@ -143,7 +143,7 @@ export function analyzePatterns(
 
       // check existing patterns we've encountered
       for (const [k, found] of values[key].collection) {
-        if (overlap(pattern[found.noteCheckIndex], note.raw)) {
+        if (overlap(pattern.notes[found.noteCheckIndex], note.raw)) {
           const updated: PatternData = {
             ...found,
             noteCheckIndex: found.noteCheckIndex + 1,
@@ -158,7 +158,7 @@ export function analyzePatterns(
 
           values[key].collection.set(k, updated);
 
-          if (updated.noteCheckIndex === pattern.length) {
+          if (updated.noteCheckIndex === pattern.notes.length) {
             // end of pattern, set completed, increase count
             const data = values[key].collection.get(k)!;
             values[key].collection.set(k, {
@@ -179,7 +179,7 @@ export function analyzePatterns(
       }
 
       // current index we are comparing,
-      const firstNoteOfPattern = pattern[0];
+      const firstNoteOfPattern = pattern.notes[0];
 
       // check for start of pattern
       if (overlap(firstNoteOfPattern, note.raw)) {
@@ -206,7 +206,7 @@ export function analyzePatterns(
     const pattern = patterns[key];
 
     for (const [k, found] of values[key].collection) {
-      if (found.noteCheckIndex !== pattern.length) {
+      if (found.noteCheckIndex !== pattern.notes.length) {
         values[key].collection.delete(k);
       }
     }

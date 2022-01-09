@@ -7,7 +7,7 @@ interface ChartStoreState {
 
 export const useChartStore = defineStore("chart", {
   state: (): ChartStoreState => ({
-    selectedChartId: "candles",
+    selectedChartId: "uber-rave",
   }),
 
   actions: {

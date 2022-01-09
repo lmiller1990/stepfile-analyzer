@@ -1,11 +1,6 @@
 import { describe, it, expect } from "vitest";
 
-import {
-  Measure,
-  NoteLine,
-  NoteLineWithPatternData,
-  PatternData,
-} from "./types";
+import { Measure, NoteLineWithPatternData } from "./types";
 import {
   addPatternDataToMeasures,
   analyzePatterns,
@@ -14,7 +9,14 @@ import {
   overlap,
   parse,
 } from "./analysis";
-import { down, right, up, PatternBag, left } from "./patterns";
+import {
+  down,
+  right,
+  up,
+  PatternBag,
+  left,
+  patterns as allPatterns,
+} from "./patterns";
 
 const data = `0010
 0001
@@ -60,7 +62,7 @@ describe("analyzePatterns", () => {
     const { lines, measures } = parse(data);
 
     const patterns: PatternBag = {
-      "urd-candle": [up, right, down],
+      "urd-candle": allPatterns["urd-candle"],
     };
 
     const analysis = createAnalysisResults(patterns);
@@ -91,7 +93,7 @@ it("works across measures with same quantization", () => {
   const { lines, measures } = parse(data);
 
   const patterns: PatternBag = {
-    "urd-candle": [up, right, down],
+    "urd-candle": allPatterns["urd-candle"],
   };
 
   const analysis = createAnalysisResults(patterns);
@@ -125,7 +127,7 @@ it("works across measures with different quantization, m1 < m2", () => {
   const { lines, measures } = parse(data);
 
   const patterns: PatternBag = {
-    "urd-candle": [up, right, down],
+    "urd-candle": allPatterns["urd-candle"],
   };
 
   const analysis = createAnalysisResults(patterns);
@@ -159,7 +161,7 @@ it("detects uneven pattern, m1 > m2", () => {
   const { lines, measures } = parse(data);
 
   const patterns: PatternBag = {
-    "urd-candle": [up, right, down],
+    "urd-candle": allPatterns["urd-candle"],
   };
 
   const analysis = createAnalysisResults(patterns);
@@ -193,7 +195,12 @@ it("detects uneven pattern, m1 < m2", () => {
   const { lines, measures } = parse(data);
 
   const patterns: PatternBag = {
-    "rrrr-jack": [right, right, right, right],
+    "rrrr-jack": {
+      notes: [right, right, right, right],
+      label: "RRRR Jack",
+      id: "rrrr-jack",
+      category: "jack",
+    },
   };
 
   const analysis = createAnalysisResults(patterns);
@@ -216,13 +223,13 @@ it("double taps", () => {
 ,`);
 
   const patterns: PatternBag = {
-    ll: [left, left],
+    "ll-double-tap": allPatterns["ll-double-tap"],
   };
 
   const analysis = createAnalysisResults(patterns);
   const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-  expect(actual["ll"].count).toBe(3);
+  expect(actual["ll-double-tap"].count).toBe(3);
 });
 
 //   // HERE
@@ -284,9 +291,24 @@ it("quantization", () => {
 ,`);
 
   const patterns: PatternBag = {
-    ll: [left, left],
-    lll: [left, left, left],
-    llll: [left, left, left, left],
+    ll: {
+      id: "ll",
+      label: "",
+      category: "jack",
+      notes: [left, left],
+    },
+    lll: {
+      id: "lll",
+      label: "",
+      category: "jack",
+      notes: [left, left, left],
+    },
+    llll: {
+      id: "llll",
+      label: "",
+      category: "jack",
+      notes: [left, left, left, left],
+    },
   };
 
   const analysis = createAnalysisResults(patterns);
@@ -317,10 +339,10 @@ it("16th candles", () => {
 ,`);
 
   const patterns: PatternBag = {
-    "urd-candle": [up, right, down],
-    "uld-candle": [up, left, down],
-    "dlu-candle": [down, left, up],
-    "dru-candle": [down, right, up],
+    "urd-candle": allPatterns["urd-candle"],
+    "uld-candle": allPatterns["uld-candle"],
+    "dlu-candle": allPatterns["dlu-candle"],
+    "dru-candle": allPatterns["dru-candle"],
   };
 
   const analysis = createAnalysisResults(patterns);
@@ -339,7 +361,7 @@ describe("addPatternDataToMeasures", () => {
 ,`);
 
     const patterns: PatternBag = {
-      "uld-candle": [up, left, down],
+      "uld-candle": allPatterns["uld-candle"]
     };
 
     const analysis = createAnalysisResults(patterns);

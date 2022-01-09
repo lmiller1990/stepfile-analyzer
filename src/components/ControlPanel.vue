@@ -13,15 +13,15 @@ const controlsStore = useControlsStore();
     <div class="flex">
       <div>
         <h1>Patterns</h1>
-        <div v-for="name of Object.keys(patterns)" :key="name">
+        <div v-for="pattern of Object.values(patterns)" :key="pattern.id">
           <input
-            :id="name"
-            :value="name"
+            :id="pattern.id"
+            :value="pattern.id"
             type="checkbox"
-            :checked="controlsStore.selectedPatterns.has(name)"
-            @input="controlsStore.togglePattern(name)"
+            :checked="controlsStore.selectedPatterns.has(pattern.id)"
+            @input="controlsStore.togglePattern(pattern.id)"
           />
-          <label :for="name">{{ name }}</label>
+          <label :for="pattern.id">{{ pattern.label }}</label>
         </div>
       </div>
     </div>

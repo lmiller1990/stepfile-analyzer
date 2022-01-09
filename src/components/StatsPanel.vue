@@ -2,7 +2,7 @@
 import { PatternAnalysis } from "../types";
 import { patterns } from "../patterns";
 import { Quantization, quantization } from "../noteData";
-import { quantizationLabel, quantizations } from "../uiConstants";
+import { quantizationLabel } from "../uiConstants";
 
 const props = defineProps<{
   analysis: Record<string, PatternAnalysis>;
