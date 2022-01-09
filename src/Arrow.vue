@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computed, ref } from "vue";
 import type { Quantization } from "./noteData";
 import type { Direction } from "./types";
 
@@ -36,16 +37,22 @@ switch (props.direction) {
     break;
 }
 
-const style = {
-  transform: `rotate(${rotation})`,
-};
+const fill = colors.get(props.quantization);
 
-console.log(props.quantization)
-const fill = colors.get(props.quantization)
+const root = ref<SVGElement>();
+
+const style = computed(() => {
+  const top = root.value ? root.value.getBoundingClientRect().height / 2 : 0;
+  return {
+    transform: `rotate(${rotation})`,
+    top: `-${top}px`,
+  };
+});
 </script>
 
 <template>
   <svg
+    ref="root"
     viewBox="0 0 100 100"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -62,3 +69,9 @@ const fill = colors.get(props.quantization)
     />
   </svg>
 </template>
+
+<style scoped>
+svg {
+  position: absolute;
+}
+</style>
