@@ -12,6 +12,7 @@ type TokenType =
   | "stepsType"
   | "title"
   | "endOfNotes"
+  | "endMeasure"
   | "meter"
   | "notes"
   | "difficulty"
@@ -52,6 +53,10 @@ const tokenMatches: TokenMatch[] = [
   {
     type: "noteLine",
     regexp: /^[0|1|2|3|X]{4}$/,
+  },
+  {
+    type: "endMeasure",
+    regexp: /,/,
   },
   {
     type: "endOfNotes",

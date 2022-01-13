@@ -32,6 +32,6 @@ describe("codegenSSC", () => {
     const tokens = tokenize();
     const parsed = new SSCParser(tokens).parse();
     const codeGen = codegenSSC(parsed)
-    expect(codegenSSC).toMatchSnapshot();
+    expect(codeGen).toMatchSnapshot();
   });
 });
