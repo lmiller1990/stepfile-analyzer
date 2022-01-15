@@ -23,6 +23,7 @@ const chartStore = useChartStore()
           <!-- remove temporary 0th quantization -->
           <div v-for="q of quantizations.slice(1)" :key="q.id">
             <input
+              :data-cy="`quantization-${q.id}`"
               type="checkbox"
               :id="q.id"
               :value="q.id"

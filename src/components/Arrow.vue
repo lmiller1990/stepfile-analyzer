@@ -73,5 +73,6 @@ const style = computed(() => {
 <style scoped>
 svg {
   position: absolute;
+  z-index: 1;
 }
 </style>

@@ -370,15 +370,17 @@ it("quantization with 48ths", () => {
 0000
 ,`);
 
-  const ldr = allPatterns['ldr-crossover']
+  const ldr = allPatterns["ldr-crossover"];
   const patterns: PatternBag = {
-    'ldr-crossover': ldr
+    "ldr-crossover": ldr,
   };
 
   const analysis = createAnalysisResults(patterns);
   const actual = analyzePatterns(analysis, lines, measures, patterns);
 
-  expect(actual['ldr-crossover'].collection.get('1')?.patternQuantization).toBe(16)
+  expect(actual["ldr-crossover"].collection.get("1")?.patternQuantization).toBe(
+    16
+  );
 });
 
 it("16th candles", () => {
@@ -432,14 +434,54 @@ describe("addPatternDataToMeasures", () => {
     const actual = addPatternDataToMeasures(measures, data);
     const expected: Measure<NoteLineWithPatternData>[] = [
       {
-        notes: [
-          { ...lines[0], patterns: new Map() },
-          { ...lines[1], patterns: new Map([["uld-candle", 4]]) },
-          { ...lines[2], patterns: new Map([["uld-candle", 4]]) },
-          { ...lines[3], patterns: new Map([["uld-candle", 4]]) },
-        ],
         quantization: 4,
         number: 1,
+        startingLineNumber: 1,
+        notes: [
+          { ...lines[0], patterns: new Map() },
+          {
+            ...lines[1],
+            patterns: new Map([
+              [
+                "uld-candle",
+                {
+                  isFirstNoteOfPattern: true,
+                  isLastNoteOfPattern: false,
+                  patternQuantization: 4,
+                  patternRandomId: "1",
+                },
+              ],
+            ]),
+          },
+          {
+            ...lines[2],
+            patterns: new Map([
+              [
+                "uld-candle",
+                {
+                  isFirstNoteOfPattern: false,
+                  isLastNoteOfPattern: false,
+                  patternQuantization: 4,
+                  patternRandomId: "1",
+                },
+              ],
+            ]),
+          },
+          {
+            ...lines[3],
+            patterns: new Map([
+              [
+                "uld-candle",
+                {
+                  isFirstNoteOfPattern: false,
+                  isLastNoteOfPattern: true,
+                  patternQuantization: 4,
+                  patternRandomId: "1",
+                },
+              ],
+            ]),
+          },
+        ],
       },
     ];
 

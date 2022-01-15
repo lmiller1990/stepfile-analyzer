@@ -1,29 +1,34 @@
 <script lang="ts" setup>
 import type { Measure, NoteLineWithPatternData } from "../types";
 import Arrow from "./Arrow.vue";
-import { HTMLAttributes } from "vue";
+import { computed, HTMLAttributes } from "vue";
 import { measureHeight } from "../uiConstants";
 import { useControlsStore } from "../store/controls";
+import { useChartStore } from "../store/chart";
 
 const props = defineProps<{
   measure: Measure<NoteLineWithPatternData>;
 }>();
 
 const controlsStore = useControlsStore();
+const chartStore = useChartStore();
 
-const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
+const highlightHeight = `${measureHeight.value / 8}px`;
+
+const measureStyle = (lineNumber: number, idx: number) => {
   const line = props.measure.notes[lineNumber - 1];
-  const highlight = Array.from(line.patterns).some(
-    ([pattern, quantization]) => {
-      const hasPattern = controlsStore.selectedPatterns.has(pattern);
-      const hasQuan =
-        controlsStore.selectedQuantizationNumbers.includes(quantization);
-      return hasPattern && hasQuan;
-    }
-  );
+  // const highlight = Array.from(line.patterns).some(
+  //   ([pattern, quantization]) => {
+  //     const hasPattern = controlsStore.selectedPatterns.has(pattern);
+  //     const hasQuan =
+  //       controlsStore.selectedQuantizationNumbers.includes(quantization);
+  //     return hasPattern && hasQuan;
+  //   }
+  // );
+  console.log(props.measure.startingLineNumber, idx, controlsStore.linesToHighlight)
 
   return {
-    background: highlight ? "rgba(172, 215, 230, 0.50)" : "none",
+    background: controlsStore.linesToHighlight.includes(props.measure.startingLineNumber + idx) ? "rgba(172, 215, 230, 0.50)" : "none",
     height: `${measureHeight.value / props.measure.quantization}px`,
   };
 };
@@ -33,16 +38,21 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
   <div class="measure">
     <div class="absolute text-xs pl-1">{{ props.measure.number }}</div>
     <div
-      v-for="line of props.measure.quantization"
-      :style="measureStyle(line)"
-      class="flex w-full"
+      v-for="(line, idx) of props.measure.quantization"
+      :data-line-id="line"
+      :style="measureStyle(line, idx)"
+      class="flex w-full relative"
       :class="{
         'measure-guide':
           line % (props.measure.quantization / 4) === 0 &&
           line !== props.measure.quantization,
       }"
     >
-      <div v-for="num of [1, 2, 3, 4]" class="w-full relative" :key="num">
+      <div
+        v-for="num of [1, 2, 3, 4]"
+        class="w-full relative"
+        :key="num"
+      >
         <Arrow
           v-if="measure.notes[line - 1].left && num === 1"
           direction="left"
@@ -90,5 +100,10 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
 
 .line {
   position: absolute;
+}
+
+.highlight-pattern {
+  background: rgba(172, 215, 230, 0.5);
+  height: v-bind("highlightHeight");
 }
 </style>

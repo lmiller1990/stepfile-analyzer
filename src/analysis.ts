@@ -5,7 +5,7 @@ import {
   quantization,
   highestCommonDenominator,
 } from "./noteData";
-import type { PatternBag } from "./patterns";
+import { PatternBag, patterns } from "./patterns";
 import type {
   ContainedNote,
   Measure,
@@ -13,6 +13,7 @@ import type {
   NoteLineWithPatternData,
   PatternAnalysis,
   PatternData,
+  PatternPositionData,
 } from "./types";
 
 function getQuantization(data: string[]): Quantization {
@@ -48,6 +49,7 @@ export function parse(data: string): {
   let id = 1;
 
   let currentMeasure: Measure = {
+    startingLineNumber: 1,
     number: measure,
     notes: [],
     quantization: 0,
@@ -71,6 +73,7 @@ export function parse(data: string): {
 
       newMeasure = false;
       currentMeasure = {
+        startingLineNumber: id,
         quantization: measureQuantization,
         number: measure,
         notes: [],
@@ -226,6 +229,8 @@ export function analyzePatterns(
   return values;
 }
 
+let runningCount = 0
+
 export function addPatternDataToMeasures(
   measures: Measure[],
   data: Record<string, PatternAnalysis>
@@ -236,7 +241,10 @@ export function addPatternDataToMeasures(
         ...x,
         notes: x.notes.map<NoteLineWithPatternData>((y) => ({
           ...y,
-          patterns: new Map<string, Quantization>(),
+          patterns: new Map<
+            string,
+            PatternPositionData
+          >(),
         })),
       };
     }
@@ -244,10 +252,21 @@ export function addPatternDataToMeasures(
 
   for (const [pattern, analysis] of Object.entries(data)) {
     for (const [_, val] of analysis.collection) {
+      runningCount++
       for (const note of val.containedNotePositionsInMeasure) {
+        const lastIndex = val.containedNotePositionsInMeasure.length - 1;
         measuresWithMetadata[note.measureNumber - 1].notes[
           note.notePosInMeasure - 1
-        ].patterns.set(pattern, val.patternQuantization);
+        ].patterns.set(pattern, {
+          patternRandomId: runningCount.toString(),
+          patternQuantization: val.patternQuantization,
+          isFirstNoteOfPattern:
+            val.containedNotePositionsInMeasure[0].notePosInMeasure ===
+            note.notePosInMeasure,
+          isLastNoteOfPattern:
+            val.containedNotePositionsInMeasure[lastIndex].notePosInMeasure ===
+            note.notePosInMeasure,
+        });
       }
     }
   }
@@ -256,7 +275,7 @@ export function addPatternDataToMeasures(
 }
 
 function sequential(notes: ContainedNote[]) {
-  let diff: number | undefined = undefined
+  let diff: number | undefined = undefined;
 
   for (let i = 0; i < notes.length - 1; i++) {
     if (!diff) {
@@ -264,9 +283,9 @@ function sequential(notes: ContainedNote[]) {
     } else {
       const newDiff = notes[i + 1].notePosInMeasure - notes[i].notePosInMeasure;
       if (diff !== newDiff) {
-        return false
+        return false;
       }
-      diff = newDiff
+      diff = newDiff;
     }
   }
 

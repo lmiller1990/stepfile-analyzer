@@ -14,6 +14,7 @@ export interface NoteLine {
 }
 
 export interface Measure<T = NoteLine> {
+  startingLineNumber: number;
   number: number;
   quantization: number;
   notes: T[];
@@ -21,13 +22,20 @@ export interface Measure<T = NoteLine> {
 
 export type Direction = "left" | "right" | "up" | "down";
 
+export interface PatternPositionData {
+  patternRandomId: string
+  patternQuantization: Quantization;
+  isFirstNoteOfPattern: boolean;
+  isLastNoteOfPattern: boolean;
+}
+
 export interface NoteLineWithPatternData extends NoteLine {
   // pattern which this note line is part of
   // and quantization ("ulr-candle", "ll-tap")
   // eg Map<[
   //   ulr-candle: 4
   // ]>
-  patterns: Map<string, Quantization>;
+  patterns: Map<string, PatternPositionData>;
 }
 
 export interface ContainedNote {

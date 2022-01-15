@@ -333,6 +333,7 @@ exports[`parse > works 2`] = `
     ],
     "number": 1,
     "quantization": 4,
+    "startingLineNumber": 1,
   },
   {
     "notes": [
@@ -435,6 +436,7 @@ exports[`parse > works 2`] = `
     ],
     "number": 2,
     "quantization": 8,
+    "startingLineNumber": 5,
   },
 ]
 `;

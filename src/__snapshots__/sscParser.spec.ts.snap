@@ -526,6 +526,7 @@ exports[`codegenSSC > works 1`] = `
 0000
 0000
 ,",
+      "steps": "dance-single",
     },
     {
       "difficulty": "Easy",
@@ -1074,6 +1075,7 @@ exports[`codegenSSC > works 1`] = `
 0000
 0000
 ,",
+      "steps": "dance-single",
     },
     {
       "difficulty": "Medium",
@@ -2101,6 +2103,7 @@ exports[`codegenSSC > works 1`] = `
 0000
 0000
 ,",
+      "steps": "dance-single",
     },
     {
       "difficulty": "Hard",
@@ -3523,6 +3526,7 @@ exports[`codegenSSC > works 1`] = `
 0000
 0000
 ,",
+      "steps": "dance-single",
     },
     {
       "difficulty": "Challenge",
@@ -5188,6 +5192,7 @@ exports[`codegenSSC > works 1`] = `
 0000
 0000
 ,",
+      "steps": "dance-single",
     },
     {
       "difficulty": "Easy",
@@ -5296,6 +5301,7 @@ exports[`codegenSSC > works 1`] = `
 ,
 ,
 ,",
+      "steps": "dance-double",
     },
     {
       "difficulty": "Medium",
@@ -5391,6 +5397,7 @@ exports[`codegenSSC > works 1`] = `
 ,
 ,
 ,",
+      "steps": "dance-double",
     },
     {
       "difficulty": "Hard",
@@ -5545,6 +5552,7 @@ exports[`codegenSSC > works 1`] = `
 ,
 ,
 ,",
+      "steps": "dance-double",
     },
     {
       "difficulty": "Challenge",
@@ -5690,6 +5698,7 @@ exports[`codegenSSC > works 1`] = `
 ,
 ,
 ,",
+      "steps": "dance-double",
     },
   ],
   "title": "ACE FOR ACES",

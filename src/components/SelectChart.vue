@@ -27,15 +27,20 @@ const charts = computed(() => {
 });
 
 function handleInput(event: Event) {
-  const difficulty = (event.target as HTMLSelectElement).value as ChartDifficulty;
-  chartStore.setSelectedChartDifficulty(difficulty)
+  const difficulty = (event.target as HTMLSelectElement)
+    .value as ChartDifficulty;
+  chartStore.setSelectedChartDifficulty(difficulty);
 }
 </script>
 
 <template>
   <div class="flex items-center justify-around">
     <h3>Select Chart:</h3>
-    <select :value="chartStore.selectedChartDifficulty" @input="handleInput">
+    <select
+      data-cy="select-chart"
+      :value="chartStore.selectedChartDifficulty"
+      @input="handleInput"
+    >
       <option
         v-for="chart of charts"
         :id="chart.difficulty"

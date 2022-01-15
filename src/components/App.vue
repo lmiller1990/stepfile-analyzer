@@ -11,11 +11,13 @@ import { measureHeight } from "../uiConstants";
 import MeasureC from "./Measure.vue";
 import { useChartStore } from "../store/chart";
 import StatsPanel from "./StatsPanel.vue";
-import { computed } from "vue";
+import { computed, watchEffect } from "vue";
 import { useError } from "../composables/useError";
 import Error from "./Error.vue";
+import { useControlsStore } from "../store/controls";
 
 const chartStore = useChartStore();
+const controlsStore = useControlsStore();
 const { error, setError } = useError();
 
 const output = computed(() => {
@@ -32,27 +34,33 @@ const output = computed(() => {
       patterns
     );
 
-
-console.log(analysis)
-    console.log(data.measures.find(x => x.number === 59))
     const measures = addPatternDataToMeasures(data.measures, analysis);
-    console.log({ measures })
 
-    setError(undefined)
+    setError(undefined);
 
     return {
       analysis,
       measures,
     };
   } catch (e) {
-    const err = e as Error
-    if (err.name === 'SSCCompilerError') {
-      setError(err.message)
+    const err = e as Error;
+    if (err.name === "SSCCompilerError") {
+      setError(err.message);
     } else {
       setError(`Unexpected error: ${err.message}`);
     }
   }
 });
+
+watchEffect(() => {
+  if (!output.value?.measures) {
+    return
+  }
+  console.log(
+   controlsStore.setToHighlight(  controlsStore.toHighlight(output.value?.measures))
+  )
+})
+
 </script>
 
 <template>
