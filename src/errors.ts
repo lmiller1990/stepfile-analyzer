@@ -5,6 +5,7 @@ export class QuantizationError extends Error {
     const message = `Charts with quantization ${outOfRange} are not yet supported. Expected quantization to be in ${quantization.join(
       ", "
     )}.`;
+    console.log("GOT", data)
     super(message); // (1)
     this.name = "QuantizationError";
   }

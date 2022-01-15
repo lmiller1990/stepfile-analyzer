@@ -1,5 +1,3 @@
-import { error } from "console";
-
 const chartDifficulty = [
   "Beginner",
   "Easy",
@@ -54,7 +52,7 @@ const tokenMatches: TokenMatch[] = [
   },
   {
     type: "noteLine",
-    regexp: /^[0|1|2|3|X]{4}$/,
+    regexp: /^[0|1|2|3|X|M]{4}$/,
   },
   {
     type: "endMeasure",
