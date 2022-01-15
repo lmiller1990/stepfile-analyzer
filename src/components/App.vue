@@ -14,7 +14,7 @@ import StatsPanel from "./StatsPanel.vue";
 import { computed, watchEffect } from "vue";
 import { useError } from "../composables/useError";
 import Error from "./Error.vue";
-import { useControlsStore } from "../store/controls";
+import { linesToHighlight, useControlsStore } from "../store/controls";
 
 const chartStore = useChartStore();
 const controlsStore = useControlsStore();
@@ -54,13 +54,17 @@ const output = computed(() => {
 
 watchEffect(() => {
   if (!output.value?.measures) {
-    return
+    return;
   }
-  console.log(
-   controlsStore.setToHighlight(  controlsStore.toHighlight(output.value?.measures))
-  )
-})
 
+  const toHighlight = linesToHighlight(
+    output.value.measures,
+    controlsStore.selectedPatterns,
+    controlsStore.selectedQuantizationNumbers
+  );
+
+  controlsStore.setToHighlight(toHighlight);
+});
 </script>
 
 <template>
