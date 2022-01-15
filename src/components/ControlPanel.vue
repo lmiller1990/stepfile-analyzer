@@ -5,10 +5,10 @@ import { quantizations } from "../uiConstants";
 import { patternsByCategory } from "../utils";
 import SelectChart from "./SelectChart.vue";
 import UploadChart from "./UploadChart.vue";
+import UseExampleChart from "./UseExampleChart.vue"
 
 const controlsStore = useControlsStore();
-const chartStore = useChartStore()
-
+const chartStore = useChartStore();
 </script>
 
 <template>
@@ -16,6 +16,7 @@ const chartStore = useChartStore()
     <h1>{{ chartStore.song?.title }}</h1>
     <SelectChart />
     <UploadChart />
+    <UseExampleChart />
     <div>
       <div>
         <h1>Quantization</h1>
