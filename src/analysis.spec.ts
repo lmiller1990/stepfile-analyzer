@@ -173,7 +173,7 @@ it("detects uneven pattern, m1 > m2", () => {
 
   const pattern = actual["urd-candle"].collection.get("7")!;
 
-  expect(pattern.patternQuantization).toBe(0);
+  expect(pattern.patternQuantization).toBe(8);
 });
 
 it("detects uneven pattern, m1 < m2", () => {
@@ -317,6 +317,68 @@ it("quantization", () => {
   expect(actual["ll"].count).toBe(5);
   expect(actual["lll"].count).toBe(4);
   expect(actual["llll"].count).toBe(3);
+});
+
+it("quantization with 48ths", () => {
+  const { lines, measures } = parse(`1000
+0000
+0000
+0100
+0000
+0000
+0001
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+,`);
+
+  const ldr = allPatterns['ldr-crossover']
+  const patterns: PatternBag = {
+    'ldr-crossover': ldr
+  };
+
+  const analysis = createAnalysisResults(patterns);
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+  expect(actual['ldr-crossover'].collection.get('1')?.patternQuantization).toBe(16)
 });
 
 it("16th candles", () => {

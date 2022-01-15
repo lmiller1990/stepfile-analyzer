@@ -1,3 +1,5 @@
+import { error } from "console";
+
 const chartDifficulty = [
   "Beginner",
   "Easy",
@@ -6,7 +8,7 @@ const chartDifficulty = [
   "Challenge",
 ] as const;
 
-type ChartDifficulty = typeof chartDifficulty[number];
+export type ChartDifficulty = typeof chartDifficulty[number];
 
 type TokenType =
   | "stepsType"
@@ -273,13 +275,14 @@ export class SSCParser {
   }
 }
 
-interface ParsedChart {
+export interface ParsedChart {
   difficulty: ChartDifficulty;
   meter: string;
   raw: string;
+  steps: 'dance-single' | 'dance-double' | string
 }
 
-interface Song {
+export interface Song {
   title: string;
   charts: ParsedChart[];
 }
@@ -302,6 +305,10 @@ export function codegenSSC(nodes: ParsedNode[]): Song {
       codegenChart.difficulty = n.value;
     }
 
+    if (n.type === "stepsType") {
+      codegenChart.steps = n.value
+    }
+
     if (n.type === "meter") {
       codegenChart.meter = n.value;
     }
@@ -317,21 +324,36 @@ export function codegenSSC(nodes: ParsedNode[]): Song {
 
     if (n.type === "EOF") {
       for (const c of codegenCharts) {
-        if (!c.difficulty || !c.meter || !c.raw) {
+        if (!c.difficulty || !c.meter || !c.raw || !c.steps) {
           throw Error(`Malformed chart: ${JSON.stringify(c)}`);
         }
         codegenSong?.charts?.push({
           difficulty: c.difficulty,
           meter: c.meter,
           raw: c.raw,
+          steps: c.steps
         });
       }
     }
   }
 
   if (!codegenSong) {
-    throw Error(`Song was not assigned, possible due to missing title of lack of EOF.`);
+    throw new SSCCompilerError();
   }
 
   return codegenSong;
+}
+
+class SSCCompilerError extends Error {
+  constructor() {
+    super('Failed to compile file. Is it a valid .ssc?')
+    this.name = 'SSCCompilerError'
+  }
+}
+
+
+export function compileSSC (data: string) {
+  const tokens = tokenizeSSC(data)
+  const parsed = new SSCParser(tokens).parse()
+  return codegenSSC(parsed)
 }

@@ -1,26 +1,48 @@
 <script lang="ts" setup>
-import { Chart, charts } from "../chart";
+import { computed } from "vue";
+import { ChartDifficulty } from "../sscParser";
 import { useChartStore } from "../store/chart";
 
 const chartStore = useChartStore();
 
+const charts = computed(() => {
+  if (!chartStore.song?.charts) {
+    return [];
+  }
+
+  return chartStore.song?.charts.reduce<
+    Array<{ difficulty: ChartDifficulty; meter: string }>
+  >((acc, curr) => {
+    if (curr.steps !== "dance-single") {
+      return acc;
+    }
+    return [
+      ...acc,
+      {
+        difficulty: curr.difficulty,
+        meter: curr.meter,
+      },
+    ];
+  }, []);
+});
+
 function handleInput(event: Event) {
-  const id = (event.target as HTMLSelectElement).value;
-  chartStore.setSelectedChartId(id);
+  const difficulty = (event.target as HTMLSelectElement).value as ChartDifficulty;
+  chartStore.setSelectedChartDifficulty(difficulty)
 }
 </script>
 
 <template>
   <div class="flex items-center justify-around">
     <h3>Select Chart:</h3>
-    <select :value="chartStore.selectedChartId" @input="handleInput">
+    <select :value="chartStore.selectedChartDifficulty" @input="handleInput">
       <option
-        v-for="chart of charts.values()"
-        :id="chart.id"
-        :value="chart.id"
-        :key="chart.id"
+        v-for="chart of charts"
+        :id="chart.difficulty"
+        :value="chart.difficulty"
+        :key="chart.difficulty"
       >
-        {{ chart.name }}
+        {{ chart.difficulty }} ({{ chart.meter }})
       </option>
     </select>
   </div>

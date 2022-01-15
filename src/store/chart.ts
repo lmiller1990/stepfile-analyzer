@@ -1,27 +1,40 @@
 import { defineStore } from "pinia";
-import { charts } from "../chart";
+import { ChartDifficulty, Song } from "../sscParser";
 
 interface ChartStoreState {
-  selectedChartId: string;
+  selectedChartDifficulty?: ChartDifficulty;
+  song?: Song;
 }
 
 export const useChartStore = defineStore("chart", {
   state: (): ChartStoreState => ({
-    selectedChartId: "uber-rave",
+    selectedChartDifficulty: undefined,
+    song: undefined,
   }),
 
   actions: {
-    setSelectedChartId(id: string) {
-      this.selectedChartId = id;
+    setSelectedChartDifficulty (difficulty: ChartDifficulty) {
+      this.selectedChartDifficulty = difficulty
+    },
+
+    setSong(song: Song) {
+      this.song = song;
     },
   },
 
   getters: {
     selectedChart: (state) => {
-      const c = charts.get(state.selectedChartId);
-      if (!c) {
-        throw Error(`No chart with id ${state.selectedChartId} found.`);
+      // const c = charts.get(state.selectedChartId);
+      if (!state.song || !state.selectedChartDifficulty) {
+        return
       }
+
+      const c = state.song.charts?.find(x => x.difficulty === state.selectedChartDifficulty)
+
+      if (!c) {
+        throw Error(`No chart with id ${state.selectedChartDifficulty} found.`);
+      }
+
       return c;
     },
   },

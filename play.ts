@@ -12,15 +12,16 @@ const data = fs.readFileSync(
   "utf-8"
 );
 
-const sweep = patterns['rl-sweep']
-const myPatterns = { 'rl-sweep': sweep }
+const sweep = patterns['ldr-crossover']
+const myPatterns = { 'ldr-crossover': sweep }
 
 const parsed = parse(data);
 const values = createAnalysisResults(myPatterns);
-const analysis = analyzePatterns(values, parsed.lines, myPatterns);
+const analysis = analyzePatterns(values, parsed.lines, parsed.measures, myPatterns);
 
 for (const pattern of Object.keys(myPatterns)) {
   const data = analysis[pattern].collection;
+  console.log(data.get('1'))
   console.log(`\nPattern: ${pattern}`);
   console.log(data.get('14'))
 

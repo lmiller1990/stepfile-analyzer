@@ -12,36 +12,61 @@ import MeasureC from "./Measure.vue";
 import { useChartStore } from "../store/chart";
 import StatsPanel from "./StatsPanel.vue";
 import { computed } from "vue";
+import { useError } from "../composables/useError";
+import Error from "./Error.vue";
 
 const chartStore = useChartStore();
+const { error, setError } = useError();
 
 const output = computed(() => {
-  const data = parse(chartStore.selectedChart.data);
-  const analysis = analyzePatterns(
-    createAnalysisResults(patterns),
-    data.lines,
-    data.measures,
-    patterns
-  );
+  if (!chartStore.selectedChart) {
+    return;
+  }
 
-  const measures = addPatternDataToMeasures(data.measures, analysis);
+  try {
+    const data = parse(chartStore.selectedChart.raw);
+    const analysis = analyzePatterns(
+      createAnalysisResults(patterns),
+      data.lines,
+      data.measures,
+      patterns
+    );
 
-  return {
-    analysis,
-    measures,
-  };
+
+console.log(analysis)
+    console.log(data.measures.find(x => x.number === 59))
+    const measures = addPatternDataToMeasures(data.measures, analysis);
+    console.log({ measures })
+
+    setError(undefined)
+
+    return {
+      analysis,
+      measures,
+    };
+  } catch (e) {
+    const err = e as Error
+    if (err.name === 'SSCCompilerError') {
+      setError(err.message)
+    } else {
+      setError(`Unexpected error: ${err.message}`);
+    }
+  }
 });
 </script>
 
 <template>
   <div class="flex justify-center">
     <div id="main-container">
-      <div id="stats-container" class="border border-left border-black p-4 is-container">
-        <StatsPanel :analysis="output.analysis" />
+      <div
+        id="stats-container"
+        class="border border-left border-black p-4 is-container"
+      >
+        <StatsPanel v-if="output" :analysis="output.analysis" />
       </div>
 
       <div id="chart-container" class="flex justify-center is-container">
-        <div id="measure-container">
+        <div id="measure-container" v-if="output">
           <MeasureC
             v-for="measure of output.measures"
             :measure="measure"
@@ -50,13 +75,18 @@ const output = computed(() => {
         </div>
       </div>
 
-      <div id="controls-container" class="border border-right border-black p-4 is-container">
+      <div
+        id="controls-container"
+        class="border border-right border-black p-4 is-container"
+      >
         <ControlPanel />
       </div>
     </div>
   </div>
+  <div class="fixed bottom-2 right-4" v-if="error">
+    <Error />
+  </div>
 </template>
-
 
 <style scoped>
 .note {

@@ -66,6 +66,7 @@ export function parse(data: string): {
 
     if (newMeasure) {
       const thisMeasure = lines.slice(i).filter((x) => x.length > 0);
+
       measureQuantization = getQuantization(thisMeasure);
 
       newMeasure = false;
@@ -161,6 +162,7 @@ export function analyzePatterns(
           if (updated.noteCheckIndex === pattern.notes.length) {
             // end of pattern, set completed, increase count
             const data = values[key].collection.get(k)!;
+
             values[key].collection.set(k, {
               ...data,
               patternQuantization: getPatternQuantization(data, measures),
@@ -254,10 +256,17 @@ export function addPatternDataToMeasures(
 }
 
 function sequential(notes: ContainedNote[]) {
+  let diff: number | undefined = undefined
+
   for (let i = 0; i < notes.length - 1; i++) {
-    const diff = notes[i + 1].notePosInMeasure - notes[i].notePosInMeasure;
-    if (diff !== 1) {
-      return false;
+    if (!diff) {
+      diff = notes[i + 1].notePosInMeasure - notes[i].notePosInMeasure;
+    } else {
+      const newDiff = notes[i + 1].notePosInMeasure - notes[i].notePosInMeasure;
+      if (diff !== newDiff) {
+        return false
+      }
+      diff = newDiff
     }
   }
 
@@ -266,6 +275,13 @@ function sequential(notes: ContainedNote[]) {
 
 function allSameQuantization(notes: ContainedNote[]) {
   return notes.every((x) => x.noteQuantization === notes[0].noteQuantization);
+}
+
+class MeasureError extends Error {
+  constructor() {
+    super();
+    this.name = "MeasureError";
+  }
 }
 
 /**
@@ -281,9 +297,8 @@ function getMeasureNumbers(notes: ContainedNote[]) {
   }, new Set<number>());
 
   if (m.size > 2) {
-    throw Error(
-      "Patterns spanning more than 2 measures are currently not supported!"
-    );
+    // "Patterns spanning more than 2 measures are currently not supported!"
+    return [];
   }
 
   return Array.from(m);
@@ -484,6 +499,10 @@ export function getPatternQuantization(
   // 0000
 
   const measureNums = getMeasureNumbers(data.containedNotePositionsInMeasure);
+
+  if (measureNums.length === 0) {
+    return 0;
+  }
 
   if (
     measureNums.length === 2 &&

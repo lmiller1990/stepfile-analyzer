@@ -31,6 +31,7 @@ const measureStyle = (lineNumber: number): HTMLAttributes["style"] => {
 
 <template>
   <div class="measure">
+    <div class="absolute text-xs pl-1">{{ props.measure.number }}</div>
     <div
       v-for="line of props.measure.quantization"
       :style="measureStyle(line)"

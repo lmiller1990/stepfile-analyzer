@@ -1,16 +1,21 @@
 <script lang="ts" setup>
+import { useChartStore } from "../store/chart";
 import { useControlsStore } from "../store/controls";
 import { quantizations } from "../uiConstants";
 import { patternsByCategory } from "../utils";
 import SelectChart from "./SelectChart.vue";
+import UploadChart from "./UploadChart.vue";
 
 const controlsStore = useControlsStore();
+const chartStore = useChartStore()
 
 </script>
 
 <template>
   <div class="h-full w-full">
+    <h1>{{ chartStore.song?.title }}</h1>
     <SelectChart />
+    <UploadChart />
     <div>
       <div>
         <h1>Quantization</h1>
