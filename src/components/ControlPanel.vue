@@ -5,7 +5,7 @@ import { quantizations } from "../uiConstants";
 import { patternsByCategory } from "../utils";
 import SelectChart from "./SelectChart.vue";
 import UploadChart from "./UploadChart.vue";
-import UseExampleChart from "./UseExampleChart.vue"
+import UseExampleChart from "./UseExampleChart.vue";
 
 const controlsStore = useControlsStore();
 const chartStore = useChartStore();

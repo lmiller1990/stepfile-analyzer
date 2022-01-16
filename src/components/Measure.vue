@@ -3,7 +3,7 @@ import type { Measure, NoteLineWithPatternData } from "../types";
 import Arrow from "./Arrow.vue";
 import { measureHeight } from "../uiConstants";
 import { useControlsStore } from "../store/controls";
-import { HTMLAttributes, } from "vue";
+import { HTMLAttributes } from "vue";
 
 const props = defineProps<{
   measure: Measure<NoteLineWithPatternData>;
@@ -20,23 +20,25 @@ const measureStyle = (idx: number) => {
   };
 };
 
-const highlightStyle = (line: number, idx: number): HTMLAttributes['style'] => {
-//  w-full h-full
-  const highlightData = controlsStore.linesToHighlight.get(props.measure.startingLineNumber + idx)
+const highlightStyle = (line: number, idx: number): HTMLAttributes["style"] => {
+  //  w-full h-full
+  const highlightData = controlsStore.linesToHighlight.get(
+    props.measure.startingLineNumber + idx
+  );
 
   if (!highlightData) {
-    return {}
+    return {};
   }
 
-  const background = "rgba(172, 215, 230, 0.50)"
-  const height = highlightData.isLastLine ? '50px' : '100%'
+  const background = "rgba(172, 215, 230, 0.50)";
+  const height = highlightData.isLastLine ? "50px" : "100%";
 
   return {
     background,
-    width: '100%',
-    height
-  }
-}
+    width: "100%",
+    height,
+  };
+};
 </script>
 
 <template>
@@ -54,11 +56,7 @@ const highlightStyle = (line: number, idx: number): HTMLAttributes['style'] => {
       }"
     >
       <div class="absolute" :style="highlightStyle(line, idx)" />
-      <div
-        v-for="num of [1, 2, 3, 4]"
-        class="w-full relative"
-        :key="num"
-      >
+      <div v-for="num of [1, 2, 3, 4]" class="w-full relative" :key="num">
         <Arrow
           v-if="measure.notes[line - 1].left && num === 1"
           direction="left"

@@ -24,7 +24,7 @@ describe("App", () => {
       },
     });
   });
-  
+
   it.only("correctly highlights pattern in 4th measure", () => {
     const sscData = `//----- song ID: acef -----//
 #VERSION:0.83;
@@ -62,10 +62,10 @@ describe("App", () => {
 0100
 0010
 0001
-;`
+;`;
     const chart = compileSSC(sscData);
-    const chartStore = useChartStore()
-    chartStore.setSong(chart)
+    const chartStore = useChartStore();
+    chartStore.setSong(chart);
 
     mount(App, {
       global: {
@@ -73,7 +73,7 @@ describe("App", () => {
       },
     });
 
-    cy.get("[data-cy='select-chart']").select("Beginner (4)")
+    cy.get("[data-cy='select-chart']").select("Beginner (4)");
     // cy.get("[data-cy='quantization-q-4']").click()
     // cy.get('label').contains("LDUR Sweep").click()
   });
@@ -145,10 +145,10 @@ describe("App", () => {
 0001
 0000
 0000
-;`
+;`;
     const chart = compileSSC(sscData);
-    const chartStore = useChartStore()
-    chartStore.setSong(chart)
+    const chartStore = useChartStore();
+    chartStore.setSong(chart);
 
     mount(App, {
       global: {
@@ -156,8 +156,8 @@ describe("App", () => {
       },
     });
 
-    cy.get("[data-cy='select-chart']").select("Beginner (4)")
-    cy.get("[data-cy='quantization-q-16']").click()
-    cy.get('label').contains("LDR Crossover").click()
+    cy.get("[data-cy='select-chart']").select("Beginner (4)");
+    cy.get("[data-cy='quantization-q-16']").click();
+    cy.get("label").contains("LDR Crossover").click();
   });
 });

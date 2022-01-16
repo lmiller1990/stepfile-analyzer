@@ -1,4 +1,4 @@
-export const monolith =  `
+export const monolith = `
 #VERSION:0.83;
 #TITLE:Monolith;
 #SUBTITLE:;
@@ -6840,4 +6840,4 @@ M00M0000
 0001
 0000
 1001
-;`
+;`;

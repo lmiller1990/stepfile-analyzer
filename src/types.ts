@@ -23,7 +23,7 @@ export interface Measure<T = NoteLine> {
 export type Direction = "left" | "right" | "up" | "down";
 
 export interface PatternPositionData {
-  patternRandomId: string
+  patternRandomId: string;
   patternQuantization: Quantization;
   isFirstNoteOfPattern: boolean;
   isLastNoteOfPattern: boolean;

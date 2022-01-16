@@ -48,7 +48,7 @@ describe("overlap", () => {
   });
 
   it("works", () => {
-    expect(overlap("1100", "1110")).toBe(true);
+    expect(overlap("1100", "1110")).toBe(false);
   });
 });
 

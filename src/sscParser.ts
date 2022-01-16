@@ -277,7 +277,7 @@ export interface ParsedChart {
   difficulty: ChartDifficulty;
   meter: string;
   raw: string;
-  steps: 'dance-single' | 'dance-double' | string
+  steps: "dance-single" | "dance-double" | string;
 }
 
 export interface Song {
@@ -304,7 +304,7 @@ export function codegenSSC(nodes: ParsedNode[]): Song {
     }
 
     if (n.type === "stepsType") {
-      codegenChart.steps = n.value
+      codegenChart.steps = n.value;
     }
 
     if (n.type === "meter") {
@@ -329,7 +329,7 @@ export function codegenSSC(nodes: ParsedNode[]): Song {
           difficulty: c.difficulty,
           meter: c.meter,
           raw: c.raw,
-          steps: c.steps
+          steps: c.steps,
         });
       }
     }
@@ -344,14 +344,13 @@ export function codegenSSC(nodes: ParsedNode[]): Song {
 
 class SSCCompilerError extends Error {
   constructor() {
-    super('Failed to compile file. Is it a valid .ssc?')
-    this.name = 'SSCCompilerError'
+    super("Failed to compile file. Is it a valid .ssc?");
+    this.name = "SSCCompilerError";
   }
 }
 
-
-export function compileSSC (data: string) {
-  const tokens = tokenizeSSC(data)
-  const parsed = new SSCParser(tokens).parse()
-  return codegenSSC(parsed)
+export function compileSSC(data: string) {
+  const tokens = tokenizeSSC(data);
+  const parsed = new SSCParser(tokens).parse();
+  return codegenSSC(parsed);
 }

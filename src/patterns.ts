@@ -151,9 +151,9 @@ export const patterns: PatternBag = {
     category: "jack",
   },
 
-  "rrr-double-tap": {
-    id: "rrr-double-tap",
-    label: "RRR Double Tap",
+  "rrr-trple-tap": {
+    id: "rrr-trple-tap",
+    label: "RRR Triple Tap",
     notes: [right, right, right],
     category: "jack",
   },
@@ -165,9 +165,9 @@ export const patterns: PatternBag = {
     category: "jack",
   },
 
-  "uuu-double-tap": {
-    id: "uuu-double-tap",
-    label: "UUU Double Tap",
+  "uuu-triple-tap": {
+    id: "uuu-triple-tap",
+    label: "UUU Triple Tap",
     notes: [up, up, up],
     category: "jack",
   },
@@ -179,9 +179,9 @@ export const patterns: PatternBag = {
     category: "jack",
   },
 
-  "ddd-double-tap": {
-    id: "ddd-double-tap",
-    label: "DDD Double Tap",
+  "ddd-triple-tap": {
+    id: "ddd-triple-tap",
+    label: "DDD Trigple Tap",
     notes: [down, down, down],
     category: "jack",
   },

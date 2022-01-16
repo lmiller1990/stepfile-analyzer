@@ -129,9 +129,10 @@ export const createAnalysisResults = (patterns: PatternBag) => {
 // 1110 & 0100 => 0100, then see if result === original
 // 0100 === 0100 => contains
 export function overlap(target: string, line: string) {
-  const t = parseInt(target, 2);
-  const l = parseInt(line, 2);
-  return (l & t) === t;
+  return target === line;
+  // const t = parseInt(target, 2);
+  // const l = parseInt(line, 2);
+  // return (l & t) === t;
 }
 
 export function analyzePatterns(
@@ -229,7 +230,7 @@ export function analyzePatterns(
   return values;
 }
 
-let runningCount = 0
+let runningCount = 0;
 
 export function addPatternDataToMeasures(
   measures: Measure[],
@@ -241,10 +242,7 @@ export function addPatternDataToMeasures(
         ...x,
         notes: x.notes.map<NoteLineWithPatternData>((y) => ({
           ...y,
-          patterns: new Map<
-            string,
-            PatternPositionData
-          >(),
+          patterns: new Map<string, PatternPositionData>(),
         })),
       };
     }
@@ -252,12 +250,11 @@ export function addPatternDataToMeasures(
 
   for (const [pattern, analysis] of Object.entries(data)) {
     for (const [_, val] of analysis.collection) {
-      runningCount++
+      runningCount++;
       for (const note of val.containedNotePositionsInMeasure) {
         const lastIndex = val.containedNotePositionsInMeasure.length - 1;
-        measuresWithMetadata[note.measureNumber - 1].notes[
-          note.notePosInMeasure - 1
-        ].patterns.set(pattern, {
+
+        const data: PatternPositionData = {
           patternRandomId: runningCount.toString(),
           patternQuantization: val.patternQuantization,
           isFirstNoteOfPattern:
@@ -266,7 +263,11 @@ export function addPatternDataToMeasures(
           isLastNoteOfPattern:
             val.containedNotePositionsInMeasure[lastIndex].notePosInMeasure ===
             note.notePosInMeasure,
-        });
+        };
+
+        measuresWithMetadata[note.measureNumber - 1].notes[
+          note.notePosInMeasure - 1
+        ].patterns.set(pattern, data);
       }
     }
   }

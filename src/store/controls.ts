@@ -58,7 +58,7 @@ export function linesToHighlight(
     }
   }
 
-  const linesToHighlight: HighlightLines = new Map()
+  const linesToHighlight: HighlightLines = new Map();
 
   for (const group of highlightMap.values()) {
     if (!group.startId || !group.finishId) {

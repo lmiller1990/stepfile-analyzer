@@ -13,8 +13,8 @@ export const useChartStore = defineStore("chart", {
   }),
 
   actions: {
-    setSelectedChartDifficulty (difficulty: ChartDifficulty) {
-      this.selectedChartDifficulty = difficulty
+    setSelectedChartDifficulty(difficulty: ChartDifficulty) {
+      this.selectedChartDifficulty = difficulty;
     },
 
     setSong(song: Song) {
@@ -26,10 +26,12 @@ export const useChartStore = defineStore("chart", {
     selectedChart: (state) => {
       // const c = charts.get(state.selectedChartId);
       if (!state.song || !state.selectedChartDifficulty) {
-        return
+        return;
       }
 
-      const c = state.song.charts?.find(x => x.difficulty === state.selectedChartDifficulty)
+      const c = state.song.charts?.find(
+        (x) => x.difficulty === state.selectedChartDifficulty
+      );
 
       if (!c) {
         throw Error(`No chart with id ${state.selectedChartDifficulty} found.`);

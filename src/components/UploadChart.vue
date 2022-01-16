@@ -9,12 +9,12 @@ const file = ref<HTMLInputElement>();
 
 async function handleUpload() {
   if (!file.value?.files?.[0]) {
-    return
+    return;
   }
 
   const sscData = await file.value.files[0].text();
-  const song = compileSSC(sscData)
-  chartStore.setSong(song)
+  const song = compileSSC(sscData);
+  chartStore.setSong(song);
 }
 </script>
 
