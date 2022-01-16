@@ -1,11 +1,11 @@
-import { QuantizationError } from "./errors";
+import { ChartQuantizationError, PatternQuantizationError } from "./errors";
 import {
   noteData,
   Quantization,
   quantization,
   highestCommonDenominator,
 } from "./noteData";
-import { PatternBag, patterns } from "./patterns";
+import { PatternBag } from "./patterns";
 import type {
   ContainedNote,
   Measure,
@@ -21,14 +21,14 @@ function getQuantization(data: string[]): Quantization {
   for (const line of data) {
     if (line.startsWith(",")) {
       if (!quantization.includes(count as Quantization)) {
-        throw new QuantizationError(count, data);
+        throw new ChartQuantizationError(count, data);
       }
       return count as Quantization;
     }
     count++;
   }
 
-  throw new QuantizationError(count, data);
+  throw new ChartQuantizationError(count, data);
 }
 
 export function parse(data: string): {
@@ -87,7 +87,7 @@ export function parse(data: string): {
     const q = noteData.get(measureQuantization)![notePosInMeasure - 1];
 
     if (!q) {
-      throw new QuantizationError(notePosInMeasure - 1, currentMeasure);
+      throw new ChartQuantizationError(notePosInMeasure - 1, currentMeasure);
     }
 
     const line: NoteLine = {
@@ -297,13 +297,6 @@ function allSameQuantization(notes: ContainedNote[]) {
   return notes.every((x) => x.noteQuantization === notes[0].noteQuantization);
 }
 
-class MeasureError extends Error {
-  constructor() {
-    super();
-    this.name = "MeasureError";
-  }
-}
-
 /**
  * Get a list of all measure numbers
  * represented by a list of notes
@@ -354,6 +347,13 @@ export function createVirtualizedMeasure(
     return curr.notePosInMeasure > acc.notePosInMeasure ? curr : acc;
   }, m1Notes[0]);
 
+  const m1Quan = m1Notes[0].measureQuantization;
+  const m2Quan = m2Notes[0].measureQuantization;
+
+  if (lastNoteOfFirstMeasure.notePosInMeasure !== m1Quan) {
+    throw new PatternQuantizationError();
+  }
+
   // Merge into a single virtual measure.
   // This means notes from m2 have their position in the measure increased.
   // If the measures have different quantization, it's a bit more complex, since
@@ -371,8 +371,6 @@ export function createVirtualizedMeasure(
   // 0000
   // 0000
   // then we just see if they are sequential like in case 1
-  const m1Quan = m1Notes[0].measureQuantization;
-  const m2Quan = m2Notes[0].measureQuantization;
 
   if (m1Quan === m2Quan) {
     return containedNotePositionsInMeasure.map((x) => {
@@ -528,13 +526,17 @@ export function getPatternQuantization(
     measureNums.length === 2 &&
     allSameQuantization(data.containedNotePositionsInMeasure)
   ) {
-    const normalizedContainedNotes = createVirtualizedMeasure(
-      measureNums as [number, number],
-      data.containedNotePositionsInMeasure
-    );
+    try {
+      const normalizedContainedNotes = createVirtualizedMeasure(
+        measureNums as [number, number],
+        data.containedNotePositionsInMeasure
+      );
 
-    if (sequential(normalizedContainedNotes)) {
-      return data.containedNotePositionsInMeasure[0].noteQuantization;
+      if (sequential(normalizedContainedNotes)) {
+        return data.containedNotePositionsInMeasure[0].noteQuantization;
+      }
+    } catch (e) {
+      return 0;
     }
   }
 
@@ -591,14 +593,19 @@ export function getPatternQuantization(
     );
 
     if (allDivisibleBy(notes, highestQuantization)) {
-      const normalized = createVirtualizedMeasure(
-        [m1, m2],
-        data.containedNotePositionsInMeasure
-      );
+      try {
+        const normalized = createVirtualizedMeasure(
+          [m1, m2],
+          data.containedNotePositionsInMeasure
+        );
 
-      // and sequential?
-      if (sequential(normalized)) {
-        return highestQuantization;
+        // and sequential?
+        if (sequential(normalized)) {
+          console.log(normalized);
+          return highestQuantization;
+        }
+      } catch (e) {
+        return 0;
       }
     }
   }

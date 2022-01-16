@@ -98,9 +98,11 @@ export function linesToHighlight(
 
   const keys = Array.from(linesToHighlight.keys());
 
-  const additional = overlaps.map((x) => nearest(x, keys));
-  additional.forEach((x) => {
-    linesToHighlight.set(x, { isLastLine: false });
+  const additional = overlaps.map((x) => [x, nearest(x, keys)]);
+  additional.forEach(([start, end]) => {
+    for (let i = start; i < end; i++) {
+      linesToHighlight.set(i, { isLastLine: false });
+    }
   });
 
   return linesToHighlight;

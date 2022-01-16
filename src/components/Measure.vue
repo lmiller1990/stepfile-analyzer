@@ -3,7 +3,7 @@ import type { Measure, NoteLineWithPatternData } from "../types";
 import Arrow from "./Arrow.vue";
 import { measureHeight } from "../uiConstants";
 import { useControlsStore } from "../store/controls";
-import { HTMLAttributes } from "vue";
+import { computed, HTMLAttributes } from "vue";
 
 const props = defineProps<{
   measure: Measure<NoteLineWithPatternData>;
@@ -13,12 +13,16 @@ const controlsStore = useControlsStore();
 
 const highlightHeight = `${measureHeight.value / 8}px`;
 
-const measureStyle = (idx: number) => {
-  return {
-    // background: controlsStore.linesToHighlight.includes(props.measure.startingLineNumber + idx) ? "rgba(172, 215, 230, 0.50)" : "none",
-    height: `${measureHeight.value / props.measure.quantization}px`,
-  };
-};
+const measureStyle = computed(() => ({
+  height: `${measureHeight.value / props.measure.quantization}px`,
+}));
+
+function handleClick (idx: number) {
+  console.log(
+    props.measure.notes,
+    props.measure.notes[idx]
+  )
+}
 
 const highlightStyle = (line: number, idx: number): HTMLAttributes["style"] => {
   //  w-full h-full
@@ -47,7 +51,7 @@ const highlightStyle = (line: number, idx: number): HTMLAttributes["style"] => {
     <div
       v-for="(line, idx) of props.measure.quantization"
       :data-line-id="line"
-      :style="measureStyle(idx)"
+      :style="measureStyle"
       class="flex w-full relative"
       :class="{
         'measure-guide':
@@ -55,7 +59,14 @@ const highlightStyle = (line: number, idx: number): HTMLAttributes["style"] => {
           line !== props.measure.quantization,
       }"
     >
-      <div class="absolute" :style="highlightStyle(line, idx)" />
+      <div
+        class="absolute text-xs flex justify-end w-full z-index-high"
+        :style="highlightStyle(line, idx)"
+        @click="handleClick(idx)"
+      >
+        {{ props.measure.startingLineNumber + idx }}
+      </div>
+
       <div v-for="num of [1, 2, 3, 4]" class="w-full relative" :key="num">
         <Arrow
           v-if="measure.notes[line - 1].left && num === 1"
@@ -109,5 +120,9 @@ const highlightStyle = (line: number, idx: number): HTMLAttributes["style"] => {
 .highlight-pattern {
   background: rgba(172, 215, 230, 0.5);
   height: v-bind("highlightHeight");
+}
+
+.z-index-high {
+  z-index: 20;
 }
 </style>

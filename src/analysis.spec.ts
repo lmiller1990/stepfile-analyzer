@@ -78,6 +78,57 @@ describe("analyzePatterns", () => {
   });
 });
 
+it("ignores pattern with non uniform 16th UDUD drill", () => {
+  const data = `0100
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0100
+0000
+,
+0010
+0100
+0010
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+0000
+,`;
+
+  const { lines, measures } = parse(data);
+
+  const patterns: PatternBag = {
+    "dudu-drill": allPatterns["dudu-drill"],
+  };
+
+  const analysis = createAnalysisResults(patterns);
+
+  const actual = analyzePatterns(analysis, lines, measures, patterns);
+
+  const pattern = actual["dudu-drill"].collection.get("15")!;
+
+  expect(pattern.patternQuantization).toBe(0);
+});
+
 it("works across measures with same quantization", () => {
   const data = `0000
     0000
