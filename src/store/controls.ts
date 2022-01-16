@@ -1,3 +1,4 @@
+import { add, over } from "cypress/types/lodash";
 import { defineStore } from "pinia";
 import { Quantization } from "../noteData";
 import {
@@ -19,6 +20,20 @@ type HighlightLines = Map<
     isLastLine: boolean;
   }
 >;
+
+function nearest(num: number, others: number[]) {
+  return others.reduce<number>((acc, curr) => {
+    if (num > curr) {
+      return acc;
+    }
+
+    if (curr - num < acc - num) {
+      return curr;
+    }
+
+    return acc;
+  }, Number.POSITIVE_INFINITY);
+}
 
 export function linesToHighlight(
   measures: Measure<NoteLineWithPatternData>[],
@@ -60,17 +75,33 @@ export function linesToHighlight(
 
   const linesToHighlight: HighlightLines = new Map();
 
+  let overlaps: number[] = [];
+
   for (const group of highlightMap.values()) {
     if (!group.startId || !group.finishId) {
-      throw Error(
-        `Expected ${JSON.stringify(group)} to have startId and endId!`
+      console.error(
+        `Bug alert! Expected ${JSON.stringify(
+          group
+        )} to have startId and endId! Using a hack to attempt to correctly highlight measures.`
       );
+      if (group.startId && !group.finishId) {
+        overlaps.push(group.startId);
+      }
+
+      continue;
     }
 
     for (let i = group.startId; i <= group.finishId; i++) {
       linesToHighlight.set(i, { isLastLine: i === group.finishId });
     }
   }
+
+  const keys = Array.from(linesToHighlight.keys());
+
+  const additional = overlaps.map((x) => nearest(x, keys));
+  additional.forEach((x) => {
+    linesToHighlight.set(x, { isLastLine: false });
+  });
 
   return linesToHighlight;
 }
