@@ -63,9 +63,7 @@ const highlightStyle = (line: number, idx: number): HTMLAttributes["style"] => {
         class="absolute text-xs flex justify-end w-full z-index-high"
         :style="highlightStyle(line, idx)"
         @click="handleClick(idx)"
-      >
-        {{ props.measure.startingLineNumber + idx }}
-      </div>
+      />
 
       <div v-for="num of [1, 2, 3, 4]" class="w-full relative" :key="num">
         <Arrow
